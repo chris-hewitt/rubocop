@@ -282,7 +282,7 @@ RSpec.describe RuboCop::Cop::Cop, :config do
     end
 
     context 'when the option is given' do
-      let(:cop_options) { { auto_correct: true } }
+      let(:cop_options) { { autocorrect: true } }
 
       it { is_expected.to be(true) }
 

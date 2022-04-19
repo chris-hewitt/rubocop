@@ -49,7 +49,7 @@ module RuboCop
       end
 
       def autocorrect?
-        @options[:auto_correct]
+        @options[:autocorrect]
       end
 
       def debug?

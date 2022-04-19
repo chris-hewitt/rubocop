@@ -61,7 +61,7 @@ module RuboCop
                             correction_count,
                             correctable_count,
                             rainbow,
-                            safe_auto_correct: @options[:safe_auto_correct])
+                            safe_auto_correct: @options[:safe_autocorrect])
 
         output.puts
         output.puts report.summary

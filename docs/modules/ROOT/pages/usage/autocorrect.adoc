@@ -7,7 +7,7 @@ In autocorrect mode, RuboCop will try to automatically fix offenses:
 ----
 $ rubocop -A
 # or
-$ rubocop --auto-correct-all
+$ rubocop --autocorrect-all
 ----
 
 There are a couple of things to keep in mind about autocorrect:
@@ -26,7 +26,7 @@ TIP: You should always run your test suite after using the autocorrect functiona
 ----
 $ rubocop -a
 # or
-$ rubocop --auto-correct
+$ rubocop --autocorrect
 ----
 
 In RuboCop 0.60, we began to annotate cops as `Safe` or not safe. The definition of
@@ -40,7 +40,7 @@ design) or not.
 does is safe (equivalent) by design. If a cop is unsafe its autocorrect automatically
 becomes unsafe as well.
 
-If a cop or its autocorrect is annotated as "not safe", it will be omitted when using `--auto-correct`.
+If a cop or its autocorrect is annotated as "not safe", it will be omitted when using `--autocorrect`.
 
 NOTE: Currently there might still be cops that aren't marked as unsafe or
 with unsafe autocorrect.  Eventually, the safety of each cop will be specified
@@ -93,7 +93,7 @@ To run all autocorrections (safe and unsafe):
 ----
 $ rubocop -A
 # or
-$ rubocop --auto-correct-all
+$ rubocop --autocorrect-all
 ----
 
 It is recommended to be even more vigilant when using this option and review carefully the changes.
@@ -102,14 +102,14 @@ It is recommended to be even more vigilant when using this option and review car
 
 [source,sh]
 ----
-$ rubocop --auto-correct --disable-uncorrectable
+$ rubocop --autocorrect --disable-uncorrectable
 ----
 
 or
 
 [source,sh]
 ----
-$ rubocop --auto-correct-all --disable-uncorrectable
+$ rubocop --autocorrect-all --disable-uncorrectable
 ----
 
 You can add the flag `--disable-uncorrectable`, which will generate

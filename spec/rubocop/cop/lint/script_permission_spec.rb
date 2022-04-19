@@ -43,7 +43,7 @@ RSpec.describe RuboCop::Cop::Lint::ScriptPermission, :config do
       context 'if autocorrection is off' do
         # very dirty hack
         def _investigate(cop, processed_source)
-          cop.instance_variable_get(:@options)[:auto_correct] = false
+          cop.instance_variable_get(:@options)[:autocorrect] = false
           super
         end
 
