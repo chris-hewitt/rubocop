@@ -80,7 +80,7 @@ module RuboCop
         option(opts, '-x', '--fix-layout') do
           @options[:only] ||= []
           @options[:only] << 'Layout'
-          @options[:auto_correct] = true
+          @options[:autocorrect] = true
         end
         option(opts, '--safe')
         add_cop_selection_csv_option('except', opts)
@@ -126,14 +126,50 @@ module RuboCop
       end
     end
 
-    def add_autocorrection_options(opts)
+    def OLD_add_autocorrection_options(opts)
       section(opts, 'Autocorrection') do
-        option(opts, '-a', '--auto-correct') { @options[:safe_auto_correct] = true }
-        option(opts, '--safe-auto-correct') do
+
+        option(opts, '-a', '--auto-correct') do # sets :auto_correct, then :safe_auto_correct
+          @options[:safe_auto_correct] = true
+        end
+        option(opts, '--safe-auto-correct') do # sets :safe_auto_correct, then :auto_correct
           warn '--safe-auto-correct is deprecated; use --auto-correct'
           @options[:safe_auto_correct] = @options[:auto_correct] = true
         end
-        option(opts, '-A', '--auto-correct-all') { @options[:auto_correct] = true }
+
+        option(opts, '-A', '--auto-correct-all') do # sets :auto_correct_all, then :auto_correct, but NOT :safe_auto_correct
+          @options[:auto_correct] = true
+        end
+
+        option(opts, '--disable-uncorrectable')
+      end
+    end
+
+    def add_autocorrection_options(opts)
+      section(opts, 'Autocorrection') do
+
+        option(opts, '-a', '--autocorrect') do
+          @options[:safe_auto_correct] = @options[:auto_correct] = true
+        end
+        option(opts, '--auto-correct') do
+          warn '--auto-correct is deprecated; use --autocorrect'
+          @options[:safe_auto_correct] = @options[:autocorrect] = true
+        end
+        option(opts, '--safe-auto-correct') do
+          warn '--safe-auto-correct is deprecated; use --autocorrect'
+          @options[:auto_correct] = @options[:autocorrect] = true
+        end
+
+        option(opts, '-A', '--autocorrect-all') do
+          @options[:safe_auto_correct] = @options[:auto_correct] = @options[:autocorrect] = true
+          @options[:auto_correct_all] = true
+        end
+        option(opts, '--auto-correct-all') do
+          warn '--auto-correct-all is deprecated; use --autocorrect-all'
+          @options[:safe_auto_correct] = @options[:auto_correct] = @options[:autocorrect] = true
+          @options[:autocorrect_all] = true
+        end
+
         option(opts, '--disable-uncorrectable')
       end
     end
@@ -234,7 +270,7 @@ module RuboCop
     end
 
     # Finds the option in `args` starting with -- and converts it to a symbol,
-    # e.g. [..., '--auto-correct', ...] to :auto_correct.
+    # e.g. [..., '--autocorrect', ...] to :autocorrect.
     def long_opt_symbol(args)
       long_opt = args.find { |arg| arg.start_with?('--') }
       long_opt[2..-1].sub('[no-]', '').sub(/ .*/, '').tr('-', '_').gsub(/[\[\]]/, '').to_sym
@@ -343,11 +379,11 @@ module RuboCop
     end
 
     def validate_auto_correct
-      return if @options.key?(:auto_correct)
+      return if @options.key?(:autocorrect)
       return unless @options.key?(:disable_uncorrectable)
 
       raise OptionArgumentError,
-            format('--disable-uncorrectable can only be used together with --auto-correct.')
+            format('--disable-uncorrectable can only be used together with --autocorrect.')
     end
 
     def disable_parallel_when_invalid_option_combo
@@ -356,7 +392,7 @@ module RuboCop
       invalid_options = [
         { name: :auto_gen_config, value: true, flag: '--auto-gen-config' },
         { name: :fail_fast, value: true, flag: '-F/--fail-fast.' },
-        { name: :auto_correct, value: true, flag: '--auto-correct.' },
+        { name: :autocorrect, value: true, flag: '--autocorrect.' },
         { name: :cache, value: 'false', flag: '--cache false' }
       ]
 
@@ -441,7 +477,7 @@ module RuboCop
       exclude_limit:                    ['Set the limit for how many files to explicitly exclude.',
                                          'If there are more files than the limit, the cop will',
                                          "be disabled instead. Default is #{MAX_EXCL}."],
-      disable_uncorrectable:            ['Used with --auto-correct to annotate any',
+      disable_uncorrectable:            ['Used with --autocorrect to annotate any',
                                          'offenses that do not support autocorrect',
                                          'with `rubocop:todo` comments.'],
       force_exclusion:                  ['Any files excluded by `Exclude` in configuration',
@@ -507,11 +543,13 @@ module RuboCop
       safe:                             'Run only safe cops.',
       stderr:                           ['Write all output to stderr except for the',
                                          'autocorrected source. This is especially useful',
-                                         'when combined with --auto-correct and --stdin.'],
+                                         'when combined with --autocorrect and --stdin.'],
       list_target_files:                'List all files RuboCop will inspect.',
-      auto_correct:                     'Autocorrect offenses (only when it\'s safe).',
+      autocorrect:                      'Autocorrect offenses (only when it\'s safe).',
+      auto_correct:                     '(same, deprecated)',
       safe_auto_correct:                '(same, deprecated)',
-      auto_correct_all:                 'Autocorrect offenses (safe and unsafe)',
+      autocorrect_all:                  'Autocorrect offenses (safe and unsafe)',
+      auto_correct_all:                 '(same, deprecated)',
       fix_layout:                       'Run only layout cops, with autocorrect on.',
       color:                            'Force color output on or off.',
       version:                          'Display version.',
