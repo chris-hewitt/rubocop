@@ -103,7 +103,7 @@ RSpec.describe RuboCop::Cop::Layout::LeadingEmptyLines, :config do
           def bar(arg =1); end
         RUBY
 
-        options = { auto_correct: true, stdin: true }
+        options = { autocorrect: true, stdin: true }
         team = RuboCop::Cop::Team.mobilize(cops, config, options)
         team.inspect_file(parse_source(source_with_offenses, nil))
         new_source = options[:stdin]

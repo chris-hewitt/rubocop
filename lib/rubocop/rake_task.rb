@@ -67,10 +67,10 @@ module RuboCop
         task(:auto_correct, *args) do |_, task_args|
           RakeFileUtils.verbose(verbose) do
             yield(*[self, task_args].slice(0, task_block.arity)) if task_block
-            options = full_options.unshift('--auto-correct-all')
+            options = full_options.unshift('--autocorrect-all')
             # `--parallel` will automatically be removed from the options internally.
             # This is a nice to have to suppress the warning message
-            # about --parallel and --auto-correct not being compatible.
+            # about --parallel and --autocorrect not being compatible.
             options.delete('--parallel')
             run_cli(verbose, options)
           end

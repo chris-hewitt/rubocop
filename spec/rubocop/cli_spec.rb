@@ -326,7 +326,7 @@ RSpec.describe RuboCop::CLI, :isolated_environment do
       end
     end
 
-    context 'when --auto-correct-all is given' do
+    context 'when --autocorrect-all is given' do
       it 'does not trigger RedundantCopDisableDirective due to lines moving around' do
         src = ['a = 1 # rubocop:disable Lint/UselessAssignment']
         create_file('example.rb', src)

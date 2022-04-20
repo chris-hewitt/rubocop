@@ -13,7 +13,7 @@ module RuboCop
       end
 
       def autocorrect_requested?
-        @options.fetch(:auto_correct, false)
+        @options.fetch(:autocorrect, false)
       end
 
       def correctable?

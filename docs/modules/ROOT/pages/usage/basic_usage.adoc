@@ -72,7 +72,7 @@ automatically fix the problems it found in your code:
 ----
 $ rubocop -a
 # or
-$ rubocop --auto-correct
+$ rubocop --autocorrect
 ----
 
 TIP: See xref:usage/autocorrect.adoc[Autocorrect] for more details.
@@ -132,10 +132,16 @@ $ rubocop --only Rails/Blank,Layout/HeredocIndentation,Naming/FileName
 |===
 | Command flag | Description
 
-| `-a/--auto-correct`
+| `-a/--autocorrect`
 | Autocorrect offenses (only when it's safe). See xref:usage/autocorrect.adoc[Autocorrect].
 
-| `-A/--auto-correct-all`
+| `--auto-correct`
+| Autocorrect offenses (only when it's safe). See xref:usage/autocorrect.adoc[Autocorrect].
+
+| `-A/--autocorrect-all`
+| Autocorrect offenses (safe and unsafe). See xref:usage/autocorrect.adoc[Autocorrect].
+
+| `--auto-correct-all`
 | Autocorrect offenses (safe and unsafe). See xref:usage/autocorrect.adoc[Autocorrect].
 
 | `--auto-gen-config`
@@ -157,7 +163,7 @@ $ rubocop --only Rails/Blank,Layout/HeredocIndentation,Naming/FileName
 | Run without pending cops.
 
 | `--disable-uncorrectable`
-| Used with --auto-correct to annotate any offenses that do not support autocorrect with `rubocop:todo` comments.
+| Used with --autocorrect to annotate any offenses that do not support autocorrect with `rubocop:todo` comments.
 
 | `-D/--[no-]display-cop-names`
 | Displays cop names in offense messages. Default is true.
@@ -234,7 +240,7 @@ $ rubocop --only Rails/Blank,Layout/HeredocIndentation,Naming/FileName
 | `--safe`
 | Run only safe cops.
 
-| `--safe-auto-correct`
+| `--safe-autocorrect`
 | Omit cops annotated as "not safe". See xref:usage/autocorrect.adoc[Autocorrect].
 
 | `--show-cops`
@@ -244,7 +250,7 @@ $ rubocop --only Rails/Blank,Layout/HeredocIndentation,Naming/FileName
 | Shows urls for documentation pages of supplied cops.
 
 | `--stderr`
-| Write all output to stderr except for the autocorrected source. This is especially useful when combined with `--auto-correct` and `--stdin`.
+| Write all output to stderr except for the autocorrected source. This is especially useful when combined with `--autocorrect` and `--stdin`.
 
 | `-s/--stdin`
 | Pipe source from STDIN. This is useful for editor integration. Takes one argument, a path, relative to the root of the project. RuboCop will use this path to determine which cops are enabled (via eg. Include/Exclude), and so that certain cops like Naming/FileName can be checked.
@@ -271,7 +277,7 @@ Thus, the options have the following order of precedence (from highest to lowest
 RuboCop exits with the following status codes:
 
 * `0` if no offenses are found or if the severity of all offenses are less than
-`--fail-level`. (By default, if you use `--auto-correct`, offenses which are
+`--fail-level`. (By default, if you use `--autocorrect`, offenses which are
 autocorrected do not cause RuboCop to fail.)
 * `1` if one or more offenses equal or greater to `--fail-level` are found. (By
 default, this is any offense which is not autocorrected.)

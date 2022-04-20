@@ -113,7 +113,7 @@ RSpec.describe RuboCop::Options, :isolated_environment do
                                                if no format is specified.
                   --stderr                     Write all output to stderr except for the
                                                autocorrected source. This is especially useful
-                                               when combined with --auto-correct and --stdin.
+                                               when combined with --autocorrect and --stdin.
                   --display-time               Display elapsed time in seconds.
                   --display-only-failed        Only output offense messages. Omit passing
                                                cops. Only valid for --format junit.
@@ -122,10 +122,12 @@ RSpec.describe RuboCop::Options, :isolated_environment do
                                                the specified --fail-level or above
 
           Autocorrection:
-              -a, --auto-correct               Autocorrect offenses (only when it's safe).
+              -a, --autocorrect                Autocorrect offenses (only when it's safe).
+                  --auto-correct               (same, deprecated)
                   --safe-auto-correct          (same, deprecated)
-              -A, --auto-correct-all           Autocorrect offenses (safe and unsafe)
-                  --disable-uncorrectable      Used with --auto-correct to annotate any
+              -A, --autocorrect-all            Autocorrect offenses (safe and unsafe)
+                  --auto-correct-all           (same, deprecated)
+                  --disable-uncorrectable      Used with --autocorrect to annotate any
                                                offenses that do not support autocorrect
                                                with `rubocop:todo` comments.
 
@@ -229,10 +231,10 @@ RSpec.describe RuboCop::Options, :isolated_environment do
         end
       end
 
-      context 'combined with --auto-correct' do
+      context 'combined with --autocorrect' do
         it 'ignores parallel' do
-          msg = '-P/--parallel is being ignored because it is not compatible with --auto-correct'
-          options.parse %w[--parallel --auto-correct]
+          msg = '-P/--parallel is being ignored because it is not compatible with --autocorrect'
+          options.parse %w[--parallel --autocorrect]
           expect($stdout.string).to include(msg)
           expect(options.instance_variable_get(:@options).keys).not_to include(:parallel)
         end
@@ -257,10 +259,10 @@ RSpec.describe RuboCop::Options, :isolated_environment do
       end
     end
 
-    context 'combined with --auto-correct and --fail-fast' do
+    context 'combined with --autocorrect and --fail-fast' do
       it 'ignores parallel' do
         msg = '-P/--parallel is being ignored because it is not compatible with -F/--fail-fast'
-        options.parse %w[--parallel --fail-fast --auto-correct]
+        options.parse %w[--parallel --fail-fast --autocorrect]
         expect($stdout.string).to include(msg)
         expect(options.instance_variable_get(:@options).keys).not_to include(:parallel)
       end
@@ -354,15 +356,15 @@ RSpec.describe RuboCop::Options, :isolated_environment do
     end
 
     describe '--disable-uncorrectable' do
-      it 'accepts together with --auto-correct' do
-        expect { options.parse %w[--auto-correct --disable-uncorrectable] }.not_to raise_error
+      it 'accepts together with --autocorrect' do
+        expect { options.parse %w[--autocorrect --disable-uncorrectable] }.not_to raise_error
       end
 
-      it 'accepts together with --auto-correct-all' do
-        expect { options.parse %w[--auto-correct-all --disable-uncorrectable] }.not_to raise_error
+      it 'accepts together with --autocorrect-all' do
+        expect { options.parse %w[--autocorrect-all --disable-uncorrectable] }.not_to raise_error
       end
 
-      it 'fails if given alone without --auto-correct/-a' do
+      it 'fails if given alone without --autocorrect/-a' do
         expect { options.parse %w[--disable-uncorrectable] }
           .to raise_error(RuboCop::OptionArgumentError)
       end
@@ -385,6 +387,18 @@ RSpec.describe RuboCop::Options, :isolated_environment do
 
       it 'fails if given without --auto-gen-config' do
         expect { options.parse %w[--exclude-limit 10] }.to raise_error(RuboCop::OptionArgumentError)
+      end
+    end
+
+    describe '--auto-correct' do
+      it 'is a deprecated alias' do
+        expect { options.parse %w[--auto-correct] }.to output(/deprecated/).to_stderr
+      end
+    end
+
+    describe '--auto-correct-all' do
+      it 'is a deprecated alias' do
+        expect { options.parse %w[--auto-correct-all] }.to output(/deprecated/).to_stderr
       end
     end
 

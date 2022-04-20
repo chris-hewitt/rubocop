@@ -187,7 +187,7 @@ RSpec.describe RuboCop::Runner, :isolated_environment do
   describe '#run with cops autocorrecting each-other' do
     let(:source_file_path) { create_file('example.rb', source) }
 
-    let(:options) { { auto_correct: true, formatters: [['progress', formatter_output_path]] } }
+    let(:options) { { autocorrect: true, formatters: [['progress', formatter_output_path]] } }
 
     context 'with two conflicting cops' do
       subject(:runner) do

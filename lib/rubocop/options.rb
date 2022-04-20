@@ -126,28 +126,27 @@ module RuboCop
       end
     end
 
-    def OLD_add_autocorrection_options(opts)
-      section(opts, 'Autocorrection') do
+    # def OLD_add_autocorrection_options(opts)
+    #   section(opts, 'Autocorrection') do
 
-        option(opts, '-a', '--auto-correct') do # sets :auto_correct, then :safe_auto_correct
-          @options[:safe_auto_correct] = true
-        end
-        option(opts, '--safe-auto-correct') do # sets :safe_auto_correct, then :auto_correct
-          warn '--safe-auto-correct is deprecated; use --auto-correct'
-          @options[:safe_auto_correct] = @options[:auto_correct] = true
-        end
+    #     option(opts, '-a', '--auto-correct') do # sets :auto_correct, then :safe_auto_correct
+    #       @options[:safe_auto_correct] = true
+    #     end
+    #     option(opts, '--safe-auto-correct') do # sets :safe_auto_correct, then :auto_correct
+    #       warn '--safe-auto-correct is deprecated; use --auto-correct'
+    #       @options[:safe_auto_correct] = @options[:auto_correct] = true
+    #     end
 
-        option(opts, '-A', '--auto-correct-all') do # sets :auto_correct_all, then :auto_correct, but NOT :safe_auto_correct
-          @options[:auto_correct] = true
-        end
+    #     option(opts, '-A', '--auto-correct-all') do # sets :auto_correct_all, then :auto_correct, but NOT :safe_auto_correct
+    #       @options[:auto_correct] = true
+    #     end
 
-        option(opts, '--disable-uncorrectable')
-      end
-    end
+    #     option(opts, '--disable-uncorrectable')
+    #   end
+    # end
 
     def add_autocorrection_options(opts)
       section(opts, 'Autocorrection') do
-
         option(opts, '-a', '--autocorrect') do
           @options[:safe_auto_correct] = @options[:auto_correct] = true
         end
@@ -161,12 +160,14 @@ module RuboCop
         end
 
         option(opts, '-A', '--autocorrect-all') do
-          @options[:safe_auto_correct] = @options[:auto_correct] = @options[:autocorrect] = true
+          @options[:auto_correct] = @options[:autocorrect] = true
+          # @options[:safe_auto_correct] = true
           @options[:auto_correct_all] = true
         end
         option(opts, '--auto-correct-all') do
           warn '--auto-correct-all is deprecated; use --autocorrect-all'
-          @options[:safe_auto_correct] = @options[:auto_correct] = @options[:autocorrect] = true
+          @options[:auto_correct] = @options[:autocorrect] = true
+          # @options[:safe_auto_correct] = true
           @options[:autocorrect_all] = true
         end
 

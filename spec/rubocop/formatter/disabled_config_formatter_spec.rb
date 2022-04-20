@@ -253,7 +253,7 @@ RSpec.describe RuboCop::Formatter::DisabledConfigFormatter, :isolated_environmen
     let(:expected_rubocop_todo) do
       [heading,
        '# Offense count: 1',
-       '# This cop supports safe autocorrection (--auto-correct).',
+       '# This cop supports safe autocorrection (--autocorrect).',
        'Test/Cop3:',
        '  Exclude:',
        "    - 'test_autocorrect.rb'",
@@ -266,7 +266,7 @@ RSpec.describe RuboCop::Formatter::DisabledConfigFormatter, :isolated_environmen
       ]
     end
 
-    it 'adds a comment about --auto-correct option' do
+    it 'adds a comment about --autocorrect option' do
       expect(output.string).to eq(expected_rubocop_todo)
     end
   end

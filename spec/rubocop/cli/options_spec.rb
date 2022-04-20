@@ -1118,7 +1118,7 @@ RSpec.describe 'RuboCop::CLI options', :isolated_environment do # rubocop:disabl
 
       it 'prints that cop and nothing else' do
         expect(stdout).to match(
-          ['# Supports --auto-correct',
+          ['# Supports --autocorrect',
            'Layout/IndentationStyle:',
            '  Description: Consistent indentation either with tabs only or spaces only.',
            /^  StyleGuide: ('|")#spaces-indentation('|")$/,
@@ -1143,7 +1143,7 @@ RSpec.describe 'RuboCop::CLI options', :isolated_environment do # rubocop:disabl
 
       it 'skips the unknown cop' do
         expect(stdout).to match(
-          ['# Supports --auto-correct',
+          ['# Supports --autocorrect',
            'Layout/IndentationStyle:',
            '  Description: Consistent indentation either with tabs only or spaces only.',
            /^  StyleGuide: ('|")#spaces-indentation('|")$/,
@@ -1618,7 +1618,7 @@ RSpec.describe 'RuboCop::CLI options', :isolated_environment do # rubocop:disabl
       end
     end
 
-    context 'with --auto-correct-all' do
+    context 'with --autocorrect-all' do
       def expect_autocorrected
         expect_offense_detected
         expect($stdout.string.lines.to_a.last)
@@ -1627,7 +1627,7 @@ RSpec.describe 'RuboCop::CLI options', :isolated_environment do # rubocop:disabl
       end
 
       it 'fails when option is autocorrect and all offenses are autocorrected' do
-        expect(cli.run(['--auto-correct-all', '--format', 'simple',
+        expect(cli.run(['--autocorrect-all', '--format', 'simple',
                         '--fail-level', 'autocorrect',
                         '--only', 'Layout/IndentationWidth',
                         target_file])).to eq(1)
@@ -1635,7 +1635,7 @@ RSpec.describe 'RuboCop::CLI options', :isolated_environment do # rubocop:disabl
       end
 
       it 'fails when option is A and all offenses are autocorrected' do
-        expect(cli.run(['--auto-correct-all', '--format', 'simple',
+        expect(cli.run(['--autocorrect-all', '--format', 'simple',
                         '--fail-level', 'A',
                         '--only', 'Layout/IndentationWidth',
                         target_file])).to eq(1)
@@ -1643,14 +1643,14 @@ RSpec.describe 'RuboCop::CLI options', :isolated_environment do # rubocop:disabl
       end
 
       it 'succeeds when option is not given and all offenses are autocorrected' do
-        expect(cli.run(['--auto-correct-all', '--format', 'simple',
+        expect(cli.run(['--autocorrect-all', '--format', 'simple',
                         '--only', 'Layout/IndentationWidth',
                         target_file])).to eq(0)
         expect_autocorrected
       end
 
       it 'succeeds when option is refactor and all offenses are autocorrected' do
-        expect(cli.run(['--auto-correct-all', '--format', 'simple',
+        expect(cli.run(['--autocorrect-all', '--format', 'simple',
                         '--fail-level', 'refactor',
                         '--only', 'Layout/IndentationWidth',
                         target_file])).to eq(0)
@@ -1659,7 +1659,7 @@ RSpec.describe 'RuboCop::CLI options', :isolated_environment do # rubocop:disabl
     end
   end
 
-  describe 'with --auto-correct-all and disabled offense' do
+  describe 'with --autocorrect-all and disabled offense' do
     let(:target_file) { 'example.rb' }
 
     before do
@@ -1676,7 +1676,7 @@ RSpec.describe 'RuboCop::CLI options', :isolated_environment do # rubocop:disabl
         end
       RUBY
 
-      expect(cli.run(['--auto-correct-all', '--format', 'simple',
+      expect(cli.run(['--autocorrect-all', '--format', 'simple',
                       '--fail-level', 'autocorrect',
                       target_file])).to eq(0)
 
@@ -1684,7 +1684,7 @@ RSpec.describe 'RuboCop::CLI options', :isolated_environment do # rubocop:disabl
     end
   end
 
-  describe 'with --auto-correct' do
+  describe 'with --autocorrect' do
     let(:target_file) { 'example.rb' }
 
     context 'all offenses are corrected' do
@@ -1700,7 +1700,7 @@ RSpec.describe 'RuboCop::CLI options', :isolated_environment do # rubocop:disabl
           a = "Hello"
         RUBY
 
-        expect(cli.run(['--auto-correct', '--format', 'simple', target_file])).to eq(1)
+        expect(cli.run(['--autocorrect', '--format', 'simple', target_file])).to eq(1)
 
         expect($stdout.string.lines.to_a.last)
           .to eq('1 file inspected, 2 offenses detected, 1 offense corrected' \
@@ -1715,7 +1715,7 @@ RSpec.describe 'RuboCop::CLI options', :isolated_environment do # rubocop:disabl
           puts a
         RUBY
 
-        expect(cli.run(['--auto-correct', '--format', 'simple', target_file])).to eq(1)
+        expect(cli.run(['--autocorrect', '--format', 'simple', target_file])).to eq(1)
 
         expect($stdout.string.lines.to_a.last).to eq(
           '1 file inspected, 1 offense detected, 1 more offense '\
@@ -1731,7 +1731,7 @@ RSpec.describe 'RuboCop::CLI options', :isolated_environment do # rubocop:disabl
           puts a
         RUBY
 
-        expect(cli.run(['--auto-correct', '--format', 'simple', target_file])).to eq(1)
+        expect(cli.run(['--autocorrect', '--format', 'simple', target_file])).to eq(1)
 
         expect($stdout.string.lines.to_a.last).to eq(
           '1 file inspected, 2 offenses detected, 1 offense corrected, 1 more offense '\
@@ -1755,7 +1755,7 @@ RSpec.describe 'RuboCop::CLI options', :isolated_environment do # rubocop:disabl
           a = "Hello"
         RUBY
 
-        expect(cli.run(['--auto-correct', '--format', 'simple', target_file])).to eq(1)
+        expect(cli.run(['--autocorrect', '--format', 'simple', target_file])).to eq(1)
         expect($stdout.string.lines.to_a.last).to eq("1 file inspected, 2 offenses detected\n")
       end
     end
@@ -1862,9 +1862,9 @@ RSpec.describe 'RuboCop::CLI options', :isolated_environment do # rubocop:disabl
       $stdin = STDIN
     end
 
-    it 'prints corrected code to stdout if --auto-correct-all is used' do
+    it 'prints corrected code to stdout if --autocorrect-all is used' do
       $stdin = StringIO.new('p $/')
-      argv   = ['--auto-correct-all',
+      argv   = ['--autocorrect-all',
                 '--only=Style/SpecialGlobalVars',
                 '--format=simple',
                 '--stdin',
@@ -1883,9 +1883,9 @@ RSpec.describe 'RuboCop::CLI options', :isolated_environment do # rubocop:disabl
       $stdin = STDIN
     end
 
-    it 'prints offense reports to stderr and corrected code to stdout if --auto-correct-all and --stderr are used' do
+    it 'prints offense reports to stderr and corrected code to stdout if --autocorrect-all and --stderr are used' do
       $stdin = StringIO.new('p $/')
-      argv   = ['--auto-correct-all',
+      argv   = ['--autocorrect-all',
                 '--only=Style/SpecialGlobalVars',
                 '--format=simple',
                 '--stderr',
@@ -1909,7 +1909,7 @@ RSpec.describe 'RuboCop::CLI options', :isolated_environment do # rubocop:disabl
 
     it 'can parse JSON result when specifying `--format=json` and `--stdin` options' do
       $stdin = StringIO.new('p $/')
-      argv   = ['--auto-correct-all',
+      argv   = ['--autocorrect-all',
                 '--only=Style/SpecialGlobalVars',
                 '--format=json',
                 '--stdin',
@@ -1922,7 +1922,7 @@ RSpec.describe 'RuboCop::CLI options', :isolated_environment do # rubocop:disabl
 
     it 'can parse JSON result when specifying `--format=j` and `--stdin` options' do
       $stdin = StringIO.new('p $/')
-      argv   = ['--auto-correct-all',
+      argv   = ['--autocorrect-all',
                 '--only=Style/SpecialGlobalVars',
                 '--format=j',
                 '--stdin',
