@@ -16,6 +16,10 @@ module RuboCop
         @options.fetch(:autocorrect, false)
       end
 
+      # def autocorrect_requested_safe_only?
+      #   @options.fetch(:autocorrect, false) && !@options.fetch(:autocorrect_all, false)
+      # end
+
       def correctable?
         self.class.support_autocorrect? || disable_uncorrectable?
       end
@@ -34,7 +38,9 @@ module RuboCop
 
         return false if cop_config['AutoCorrect'] == false
 
-        return safe_autocorrect? if @options.fetch(:safe_auto_correct, false)
+        # return safe_autocorrect? if autocorrect_requested_safe_only?
+        return safe_autocorrect? if @options.fetch(:autocorrect, false) &&
+                                    !@options.fetch(:autocorrect_all, false)
 
         true
       end

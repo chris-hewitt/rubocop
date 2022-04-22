@@ -137,7 +137,8 @@ module RuboCop
     #       @options[:safe_auto_correct] = @options[:auto_correct] = true
     #     end
 
-    #     option(opts, '-A', '--auto-correct-all') do # sets :auto_correct_all, then :auto_correct, but NOT :safe_auto_correct
+    #     option(opts, '-A', '--auto-correct-all') do # sets :auto_correct_all, then :auto_correct,
+    #                                                   but NOT :safe_auto_correct
     #       @options[:auto_correct] = true
     #     end
 
@@ -145,35 +146,86 @@ module RuboCop
     #   end
     # end
 
-    def add_autocorrection_options(opts)
+    # def add_autocorrection_options(opts) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+    #   section(opts, 'Autocorrection') do
+    #     option(opts, '-a', '--autocorrect') do
+    #       @options[:safe_auto_correct] = @options[:auto_correct] = true
+    #     end
+    #     option(opts, '--auto-correct') do
+    #       warn '--auto-correct is deprecated; use --autocorrect'
+    #       @options[:safe_auto_correct] = @options[:autocorrect] = true
+    #     end
+    #     option(opts, '--safe-auto-correct') do
+    #       warn '--safe-auto-correct is deprecated; use --autocorrect'
+    #       @options[:auto_correct] = @options[:autocorrect] = true
+    #     end
+
+    #     option(opts, '-A', '--autocorrect-all') do
+    #       @options[:auto_correct] = @options[:autocorrect] = true
+    #       @options[:safe_auto_correct] = true
+    #       @options[:auto_correct_all] = true
+    #     end
+    #     option(opts, '--auto-correct-all') do
+    #       warn '--auto-correct-all is deprecated; use --autocorrect-all'
+    #       @options[:auto_correct] = @options[:autocorrect] = true
+    #       @options[:safe_auto_correct] = true
+    #       @options[:autocorrect_all] = true
+    #     end
+
+    #     option(opts, '--disable-uncorrectable')
+    #   end
+    # end
+
+    def add_autocorrection_options(opts) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       section(opts, 'Autocorrection') do
-        option(opts, '-a', '--autocorrect') do
-          @options[:safe_auto_correct] = @options[:auto_correct] = true
-        end
+        option(opts, '-a', '--autocorrect')
         option(opts, '--auto-correct') do
           warn '--auto-correct is deprecated; use --autocorrect'
-          @options[:safe_auto_correct] = @options[:autocorrect] = true
+          @options[:autocorrect] = @options.delete(:auto_correct)
         end
         option(opts, '--safe-auto-correct') do
           warn '--safe-auto-correct is deprecated; use --autocorrect'
-          @options[:auto_correct] = @options[:autocorrect] = true
+          @options[:autocorrect] = @options.delete(:safe_auto_correct)
         end
 
         option(opts, '-A', '--autocorrect-all') do
-          @options[:auto_correct] = @options[:autocorrect] = true
-          # @options[:safe_auto_correct] = true
-          @options[:auto_correct_all] = true
+          # -A implies -a
+          @options[:autocorrect] = true
         end
         option(opts, '--auto-correct-all') do
           warn '--auto-correct-all is deprecated; use --autocorrect-all'
-          @options[:auto_correct] = @options[:autocorrect] = true
-          # @options[:safe_auto_correct] = true
-          @options[:autocorrect_all] = true
+          @options[:autocorrect_all] = @options.delete(:auto_correct_all)
+          # -A implies -a
+          @options[:autocorrect] = true
         end
 
         option(opts, '--disable-uncorrectable')
       end
     end
+
+    # def add_autocorrection_options(opts) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+    #   section(opts, 'Autocorrection') do
+    #     option(opts, '-a', '--autocorrect')
+    #     option(opts, '--auto-correct') do
+    #       handle_deprecated_option(:auto_correct, :autocorrect)
+    #     end
+    #     option(opts, '--safe-auto-correct') do
+    #       handle_deprecated_option(:safe_auto_correct, :autocorrect)
+    #     end
+
+    #     option(opts, '-A', '--autocorrect-all') do
+    #       # -A implies -a
+    #       @options[:autocorrect] = true
+    #     end
+    #     option(opts, '--auto-correct-all') do
+    #       handle_deprecated_option(:auto_correct_all, :autocorrect_all)
+    #       # -A implies -a
+    #       @options[:autocorrect] = true
+    #     end
+
+    #     option(opts, '--disable-uncorrectable')
+    #   end
+    # end
 
     def add_config_generation_options(opts)
       section(opts, 'Config Generation') do
@@ -242,6 +294,11 @@ module RuboCop
         option(opts, '-V', '--verbose-version')
       end
     end
+
+    # def handle_deprecated_option(old_option, new_option)
+    #   warn "--#{old_option} is deprecated; use --#{new_option}"
+    #   @options[new_option] = @options.delete(old_option)
+    # end
 
     def rainbow
       @rainbow ||= begin
