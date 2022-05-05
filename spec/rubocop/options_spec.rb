@@ -125,7 +125,7 @@ RSpec.describe RuboCop::Options, :isolated_environment do
               -a, --autocorrect                Autocorrect offenses (only when it's safe).
                   --auto-correct               (same, deprecated)
                   --safe-auto-correct          (same, deprecated)
-              -A, --autocorrect-all            Autocorrect offenses (safe and unsafe)
+              -A, --autocorrect-all            Autocorrect offenses (safe and unsafe).
                   --auto-correct-all           (same, deprecated)
                   --disable-uncorrectable      Used with --autocorrect to annotate any
                                                offenses that do not support autocorrect
