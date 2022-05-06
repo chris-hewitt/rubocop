@@ -10,7 +10,7 @@ module RuboCop
 
   # This class handles command line options.
   # @api private
-  class Options
+  class Options # rubocop:disable Metrics/ClassLength
     E_STDIN_NO_PATH = '-s/--stdin requires exactly one path, relative to the ' \
                       'root of the project. RuboCop will use this path to determine which ' \
                       'cops are enabled (via eg. Include/Exclude), and so that certain cops ' \
@@ -80,7 +80,7 @@ module RuboCop
         option(opts, '-x', '--fix-layout') do
           @options[:only] ||= []
           @options[:only] << 'Layout'
-          @options[:autocorrect] = true # -x implies -a
+          @options[:autocorrect] = true
         end
         option(opts, '--safe')
         add_cop_selection_csv_option('except', opts)
@@ -137,11 +137,11 @@ module RuboCop
         end
 
         option(opts, '-A', '--autocorrect-all') do
-          @options[:autocorrect] = true # -A implies -a
+          @options[:autocorrect] = true
         end
         option(opts, '--auto-correct-all') do
           handle_deprecated_option('--auto-correct-all', '--autocorrect-all')
-          @options[:autocorrect] = true # -A implies -a
+          @options[:autocorrect] = true
         end
 
         option(opts, '--disable-uncorrectable')

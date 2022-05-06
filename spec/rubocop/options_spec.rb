@@ -534,7 +534,8 @@ RSpec.describe RuboCop::Options, :isolated_environment do
       describe '--auto-correct-all' do
         it 'emits a warning and sets two new options instead' do
           options.parse %w[--auto-correct-all]
-          expect($stderr.string).to include('--auto-correct-all is deprecated; use --autocorrect-all')
+          expect($stderr.string).to include('--auto-correct-all is deprecated; ' \
+                                            'use --autocorrect-all')
           expect(options.instance_variable_get(:@options).keys).not_to include(:auto_correct_all)
           expect(options.instance_variable_get(:@options).keys).to include(:autocorrect_all)
           expect(options.instance_variable_get(:@options).keys).to include(:autocorrect)
