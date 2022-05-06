@@ -34,12 +34,7 @@ module RuboCop
 
         return false if cop_config['AutoCorrect'] == false
 
-        puts '@options.fetch(:autocorrect, false)'
-        pp @options.fetch(:autocorrect, false)
-        puts '@options.fetch(:autocorrect_all, false)'
-        pp @options.fetch(:autocorrect_all, false)
-        return safe_autocorrect? if @options.fetch(:autocorrect, false) &&
-                                    !@options.fetch(:autocorrect_all, false)
+        return safe_autocorrect? if @options.fetch(:safe_autocorrect, false)
 
         true
       end

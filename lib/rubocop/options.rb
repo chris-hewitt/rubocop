@@ -128,17 +128,17 @@ module RuboCop
 
     def add_autocorrection_options(opts) # rubocop:disable Metrics/MethodLength
       section(opts, 'Autocorrection') do
-        option(opts, '-a', '--autocorrect')
+        option(opts, '-a', '--autocorrect') { @options[:safe_autocorrect] = true }
         option(opts, '--auto-correct') do
           handle_deprecated_option('--auto-correct', '--autocorrect')
+          @options[:safe_autocorrect] = true
         end
         option(opts, '--safe-auto-correct') do
           handle_deprecated_option('--safe-auto-correct', '--autocorrect')
+          @options[:safe_autocorrect] = true
         end
 
-        option(opts, '-A', '--autocorrect-all') do
-          @options[:autocorrect] = true
-        end
+        option(opts, '-A', '--autocorrect-all') { @options[:autocorrect] = true }
         option(opts, '--auto-correct-all') do
           handle_deprecated_option('--auto-correct-all', '--autocorrect-all')
           @options[:autocorrect] = true

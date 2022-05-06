@@ -205,9 +205,7 @@ module RuboCop
       def set_formatter_options
         RuboCop::Formatter::DisabledConfigFormatter.config_to_allow_offenses = {}
         RuboCop::Formatter::DisabledConfigFormatter.detected_styles = {}
-        pp cop.instance_variable_get(:@options)
         cop.instance_variable_get(:@options)[:autocorrect] = true
-        pp cop.instance_variable_get(:@options)
       end
 
       # Parsed representation of code annotated with the `^^^ Message` style

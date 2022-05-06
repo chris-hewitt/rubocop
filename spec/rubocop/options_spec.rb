@@ -222,9 +222,9 @@ RSpec.describe RuboCop::Options, :isolated_environment do
     end
 
     describe '--fix-layout' do
-      it 'also sets --autocorrect' do
+      it 'also sets some autocorrect options' do
         options.parse %w[--fix-layout]
-        expect(options.instance_variable_get(:@options).keys).to include(:autocorrect)
+        ac_option_expectations_for_fix_layout
       end
     end
 
@@ -401,10 +401,17 @@ RSpec.describe RuboCop::Options, :isolated_environment do
       end
     end
 
+    describe '--autocorrect' do
+      it 'also sets some autocorrect options' do
+        options.parse %w[--autocorrect]
+        ac_option_expectations_for_autocorrect
+      end
+    end
+
     describe '--autocorrect-all' do
-      it 'also sets --autocorrect' do
+      it 'also sets some autocorrect options' do
         options.parse %w[--autocorrect-all]
-        expect(options.instance_variable_get(:@options).keys).to include(:autocorrect)
+        ac_option_expectations_for_autocorrect_all
       end
     end
 
@@ -512,35 +519,53 @@ RSpec.describe RuboCop::Options, :isolated_environment do
 
     describe 'deprecated options' do
       describe '--auto-correct' do
-        it 'emits a warning and sets the new option instead' do
+        it 'emits a warning and sets the correct options instead' do
           options.parse %w[--auto-correct]
           expect($stderr.string).to include('deprecated; use --autocorrect')
           expect(options.instance_variable_get(:@options).keys).not_to include(:auto_correct)
-          expect(options.instance_variable_get(:@options).keys).to include(:autocorrect)
-          expect(options.instance_variable_get(:@options).keys).not_to include(:autocorrect_all)
+          ac_option_expectations_for_autocorrect
         end
       end
 
       describe '--safe-auto-correct' do
-        it 'emits a warning and sets the new option instead' do
+        it 'emits a warning and sets the correct options instead' do
           options.parse %w[--safe-auto-correct]
           expect($stderr.string).to include('--safe-auto-correct is deprecated; use --autocorrect')
           expect(options.instance_variable_get(:@options).keys).not_to include(:safe_auto_correct)
-          expect(options.instance_variable_get(:@options).keys).to include(:autocorrect)
-          expect(options.instance_variable_get(:@options).keys).not_to include(:autocorrect_all)
+          ac_option_expectations_for_autocorrect
         end
       end
 
       describe '--auto-correct-all' do
-        it 'emits a warning and sets two new options instead' do
+        it 'emits a warning and sets the correct options instead' do
           options.parse %w[--auto-correct-all]
           expect($stderr.string).to include('--auto-correct-all is deprecated; ' \
                                             'use --autocorrect-all')
           expect(options.instance_variable_get(:@options).keys).not_to include(:auto_correct_all)
-          expect(options.instance_variable_get(:@options).keys).to include(:autocorrect_all)
-          expect(options.instance_variable_get(:@options).keys).to include(:autocorrect)
+          ac_option_expectations_for_autocorrect_all
         end
       end
+    end
+
+    def ac_option_expectations_for_fix_layout
+      options_keys = options.instance_variable_get(:@options).keys
+      expect(options_keys).to     include(:autocorrect)
+      expect(options_keys).not_to include(:safe_autocorrect)
+      expect(options_keys).not_to include(:autocorrect_all)
+    end
+
+    def ac_option_expectations_for_autocorrect
+      options_keys = options.instance_variable_get(:@options).keys
+      expect(options_keys).to     include(:autocorrect)
+      expect(options_keys).to     include(:safe_autocorrect)
+      expect(options_keys).not_to include(:autocorrect_all)
+    end
+
+    def ac_option_expectations_for_autocorrect_all
+      options_keys = options.instance_variable_get(:@options).keys
+      expect(options_keys).to     include(:autocorrect)
+      expect(options_keys).not_to include(:safe_autocorrect)
+      expect(options_keys).to     include(:autocorrect_all)
     end
   end
 
