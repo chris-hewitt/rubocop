@@ -80,7 +80,7 @@ module RuboCop
         option(opts, '-x', '--fix-layout') do
           @options[:only] ||= []
           @options[:only] << 'Layout'
-          @options[:autocorrect] = true
+          @options[:autocorrect] = true # -x implies -a
         end
         option(opts, '--safe')
         add_cop_selection_csv_option('except', opts)
@@ -130,17 +130,17 @@ module RuboCop
       section(opts, 'Autocorrection') do
         option(opts, '-a', '--autocorrect')
         option(opts, '--auto-correct') do
-          handle_deprecated_option(:auto_correct, :autocorrect)
+          handle_deprecated_option('--auto-correct', '--autocorrect')
         end
         option(opts, '--safe-auto-correct') do
-          handle_deprecated_option(:safe_auto_correct, :autocorrect)
+          handle_deprecated_option('--safe-auto-correct', '--autocorrect')
         end
 
         option(opts, '-A', '--autocorrect-all') do
           @options[:autocorrect] = true # -A implies -a
         end
         option(opts, '--auto-correct-all') do
-          handle_deprecated_option(:auto_correct_all, :autocorrect_all)
+          handle_deprecated_option('--auto-correct-all', '--autocorrect-all')
           @options[:autocorrect] = true # -A implies -a
         end
 
@@ -217,8 +217,8 @@ module RuboCop
     end
 
     def handle_deprecated_option(old_option, new_option)
-      warn "--#{old_option} is deprecated; use --#{new_option}"
-      @options[new_option] = @options.delete(old_option)
+      warn "#{old_option} is deprecated; use #{new_option}"
+      @options[long_opt_symbol([new_option])] = @options.delete(long_opt_symbol([old_option]))
     end
 
     def rainbow
@@ -362,7 +362,8 @@ module RuboCop
       return unless @options.key?(:disable_uncorrectable)
 
       raise OptionArgumentError,
-            format('--disable-uncorrectable can only be used together with --autocorrect.')
+            format('--disable-uncorrectable can only be used together with ' \
+                   '--autocorrect, --autocorrect-all, or --fix-layout.')
     end
 
     def disable_parallel_when_invalid_option_combo
