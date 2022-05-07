@@ -165,7 +165,7 @@ RSpec.describe 'RuboCop::CLI --auto-gen-config', :isolated_environment do # rubo
             .to eq(<<~YAML)
 
               # Offense count: 1
-              # This cop supports safe auto-correction (--autocorrect).
+              # This cop supports safe autocorrection (--autocorrect).
               # Configuration parameters: AllowHeredoc, AllowURI, URISchemes, IgnoreCopDirectives, AllowedPatterns, IgnoredPatterns.
               # URISchemes: http, https
               Layout/LineLength:

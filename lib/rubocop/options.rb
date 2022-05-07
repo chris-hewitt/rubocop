@@ -10,7 +10,7 @@ module RuboCop
 
   # This class handles command line options.
   # @api private
-  class Options # rubocop:disable Metrics/ClassLength
+  class Options
     E_STDIN_NO_PATH = '-s/--stdin requires exactly one path, relative to the ' \
                       'root of the project. RuboCop will use this path to determine which ' \
                       'cops are enabled (via eg. Include/Exclude), and so that certain cops ' \
@@ -324,15 +324,14 @@ module RuboCop
       end
 
       if display_only_fail_level_offenses_with_autocorrect?
-        raise OptionArgumentError, '--auto-correct cannot be used with ' \
-                                   '--display-only-fail-level-offenses'
+        raise OptionArgumentError, '--display-only-fail-level-offenses cannot be used with ' \
+                                   '--fix-layout, --autocorrect, or --autocorrect-all.'
       end
-
       validate_auto_gen_config
-      validate_auto_correct
+      validate_autocorrect
       validate_display_only_failed
       validate_display_only_failed_and_display_only_correctable
-      validate_display_only_correctable_and_auto_correct
+      validate_display_only_correctable_and_autocorrect
       disable_parallel_when_invalid_option_combo
 
       return if incompatible_options.size <= 1
@@ -362,13 +361,14 @@ module RuboCop
             format('--display-only-failed can only be used together with --format junit.')
     end
 
-    def validate_display_only_correctable_and_auto_correct
-      return if !@options.key?(:safe_auto_correct) && !@options.key?(:auto_correct)
+    def validate_display_only_correctable_and_autocorrect
+      return unless @options.key?(:autocorrect)
       return if !@options.key?(:display_only_correctable) &&
                 !@options.key?(:display_only_safe_correctable)
 
       raise OptionArgumentError,
-            '--auto-correct cannot be used with --display-only-[safe-]correctable.'
+            '--display-only-[safe-]correctable cannot be used with ' \
+            '--fix-layout, --autocorrect, or --autocorrect-all.'
     end
 
     def validate_display_only_failed_and_display_only_correctable
@@ -380,36 +380,45 @@ module RuboCop
             format('--display-only-failed cannot be used together with other display options.')
     end
 
-    def validate_auto_correct
+    def validate_autocorrect
       return if @options.key?(:autocorrect)
       return unless @options.key?(:disable_uncorrectable)
 
       raise OptionArgumentError,
             format('--disable-uncorrectable can only be used together with ' \
-                   '--autocorrect, --autocorrect-all, or --fix-layout.')
+                   '--fix-layout, --autocorrect, or --autocorrect-all.')
     end
 
     def disable_parallel_when_invalid_option_combo
       return unless @options.key?(:parallel)
 
-      invalid_options = [
-        { name: :auto_gen_config, value: true, flag: '--auto-gen-config' },
-        { name: :fail_fast, value: true, flag: '-F/--fail-fast.' },
-        { name: :autocorrect, value: true, flag: '--autocorrect.' },
-        { name: :cache, value: 'false', flag: '--cache false' }
-      ]
-
-      invalid_flags = invalid_options.each_with_object([]) do |option, flags|
-        # `>` rather than `>=` because `@options` will also contain `parallel: true`
-        flags << option[:flag] if @options > { option[:name] => option[:value] }
-      end
+      invalid_flags = invalid_arguments_for_parallel
 
       return if invalid_flags.empty?
 
       @options.delete(:parallel)
 
       puts '-P/--parallel is being ignored because ' \
-           "it is not compatible with #{invalid_flags.join(', ')}"
+           "it is not compatible with #{invalid_flags.join(', ')}."
+    end
+
+    def invalid_arguments_for_parallel
+      invalid_flags = []
+
+      invalid_flags << '--auto-gen-config' if @options.key?(:auto_gen_config)
+      invalid_flags << '-F/--fail-fast' if @options.key?(:fail_fast)
+      invalid_flags << '--cache false' if @options > { cache: 'false' }
+
+      # :autocorrect will be set in each of these cases, so narrow it down first
+      if @options.key?(:fix_layout)
+        invalid_flags << '-x/--fix-layout'
+      elsif @options.key?(:autocorrect_all)
+        invalid_flags << '-A/--autocorrect-all'
+      elsif @options.key?(:autocorrect)
+        invalid_flags << '-a/--autocorrect'
+      end
+
+      invalid_flags
     end
 
     def only_includes_redundant_disable?
@@ -418,8 +427,7 @@ module RuboCop
     end
 
     def display_only_fail_level_offenses_with_autocorrect?
-      @options[:display_only_fail_level_offenses] &&
-        (@options.key?(:auto_correct) || @options.key?(:safe_auto_correct))
+      @options[:display_only_fail_level_offenses] && @options.key?(:autocorrect)
     end
 
     def except_syntax?

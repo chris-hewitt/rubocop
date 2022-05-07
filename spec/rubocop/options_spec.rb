@@ -243,11 +243,25 @@ RSpec.describe RuboCop::Options, :isolated_environment do
         end
       end
 
-      context 'combined with --autocorrect' do
-        it 'ignores parallel' do
-          msg = '-P/--parallel is being ignored because it is not compatible with --autocorrect'
+      context 'combined with an autocorrect argument' do
+        it 'ignores parallel with --fix-layout' do
+          options.parse %w[--parallel --fix-layout]
+          expect($stdout.string).to include('-P/--parallel is being ignored because it is not ' \
+                                            'compatible with -x/--fix-layout')
+          expect(options.instance_variable_get(:@options).keys).not_to include(:parallel)
+        end
+
+        it 'ignores parallel with --autocorrect' do
           options.parse %w[--parallel --autocorrect]
-          expect($stdout.string).to include(msg)
+          expect($stdout.string).to include('-P/--parallel is being ignored because it is not ' \
+                                            'compatible with -a/--autocorrect')
+          expect(options.instance_variable_get(:@options).keys).not_to include(:parallel)
+        end
+
+        it 'ignores parallel with --autocorrect-all' do
+          options.parse %w[--parallel --autocorrect-all]
+          expect($stdout.string).to include('-P/--parallel is being ignored because it is not ' \
+                                            'compatible with -A/--autocorrect-all')
           expect(options.instance_variable_get(:@options).keys).not_to include(:parallel)
         end
       end
@@ -300,8 +314,8 @@ RSpec.describe RuboCop::Options, :isolated_environment do
     end
 
     describe '--display-only-fail-level-offenses' do
-      it 'fails if given with --auto-correct' do
-        %w[--auto-correct -a --auto-correct-all -A].each do |o|
+      it 'fails if given with an autocorrect argument' do
+        %w[--fix-layout -x --autocorrect -a --autocorrect-all -A].each do |o|
           expect { options.parse ['--display-only-correctable', o] }
             .to raise_error(RuboCop::OptionArgumentError)
         end
@@ -314,8 +328,8 @@ RSpec.describe RuboCop::Options, :isolated_environment do
           .to raise_error(RuboCop::OptionArgumentError)
       end
 
-      it 'fails if given with --auto-correct' do
-        %w[--auto-correct -a --auto-correct-all -A].each do |o|
+      it 'fails if given with an autocorrect argument' do
+        %w[--fix-layout -x --autocorrect -a --autocorrect-all -A].each do |o|
           expect { options.parse ['--display-only-correctable', o] }
             .to raise_error(RuboCop::OptionArgumentError)
         end
@@ -391,19 +405,13 @@ RSpec.describe RuboCop::Options, :isolated_environment do
     end
 
     describe '--disable-uncorrectable' do
-      it 'accepts together with --autocorrect' do
-        expect { options.parse %w[--autocorrect --disable-uncorrectable] }.not_to raise_error
+      it 'accepts together with an autocorrect argument' do
+        %w[--fix-layout -x --autocorrect -a --autocorrect-all -A].each do |o|
+          expect { options.parse ['--disable-uncorrectable', o] }.not_to raise_error
+        end
       end
 
-      it 'accepts together with --autocorrect-all' do
-        expect { options.parse %w[--autocorrect-all --disable-uncorrectable] }.not_to raise_error
-      end
-
-      it 'accepts together with --fix-layout' do
-        expect { options.parse %w[--fix-layout --disable-uncorrectable] }.not_to raise_error
-      end
-
-      it 'fails if given alone without --autocorrect/-a' do
+      it 'fails if given without an autocorrect argument' do
         expect { options.parse %w[--disable-uncorrectable] }
           .to raise_error(RuboCop::OptionArgumentError)
       end

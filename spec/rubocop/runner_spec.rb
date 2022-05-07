@@ -354,7 +354,7 @@ RSpec.describe RuboCop::Runner, :isolated_environment do
               def foo()
                      ^^
 
-              1 file inspected, 3 offenses detected, 3 offenses auto-correctable
+              1 file inspected, 3 offenses detected, 3 offenses autocorrectable
             RESULT
           end
         end
@@ -398,7 +398,7 @@ RSpec.describe RuboCop::Runner, :isolated_environment do
               def foo()
                      ^^
 
-              1 file inspected, 4 offenses detected, 4 offenses auto-correctable
+              1 file inspected, 4 offenses detected, 4 offenses autocorrectable
             RESULT
           end
         end
