@@ -1,0 +1,2 @@
+auto-correct->autocorrect
+auto_correct->autocorrect

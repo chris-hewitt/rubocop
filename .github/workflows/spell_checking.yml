@@ -20,8 +20,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install codespell
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - name: Check spelling with codespell
-        run: codespell --ignore-words=codespell.txt || exit 1
+      - name: Check spelling using default codespell dictionary
+        run: codespell --ignore-words=codespell_allow.txt || exit 1
+      - name: Check spelling using custom dictionary
+        run: codespell -D codespell_reject.txt || exit 1
   misspell:
     name: Check spelling of all files in commit with misspell
     runs-on: ubuntu-latest
