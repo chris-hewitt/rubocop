@@ -234,7 +234,7 @@ RSpec.describe RuboCop::Cop::Style::SymbolArray, :config do
     it 'preserves line breaks when autocorrecting a multiline array' do
       expect_offense(<<~RUBY)
         %i(
-        ^^^ Use `[:foo, :bar, :baz]` for an array of symbols.
+        ^^^ Use `[:foo,\\n:bar,\\n:baz]` for an array of symbols.
         foo
         bar
         baz
@@ -253,7 +253,7 @@ RSpec.describe RuboCop::Cop::Style::SymbolArray, :config do
     it 'preserves whitespace when autocorrecting an array using partial newlines' do
       expect_offense(<<~RUBY)
         %i(foo bar baz
-        ^^^^^^^^^^^^^^ Use `[:foo, :bar, :baz, :boz, :buz, :biz]` for an array of symbols.
+        ^^^^^^^^^^^^^^ Use `[:foo, :bar, :baz,\\n:boz, :buz,\\n:biz]` for an array of symbols.
         boz buz
         biz)
       RUBY

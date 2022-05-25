@@ -117,7 +117,7 @@ module RuboCop
         string.inspect[1..-2].tap { |s| s.gsub!(/\\"/, '"') }
       end
 
-      def symbol_without_quote?(string)
+      def can_be_converted_to_symbol_without_quoting?(string)
         special_gvars = %w[
           $! $" $$ $& $' $* $+ $, $/ $; $: $. $< $= $> $? $@ $\\ $_ $` $~ $0
           $-0 $-F $-I $-K $-W $-a $-d $-i $-l $-p $-v $-w

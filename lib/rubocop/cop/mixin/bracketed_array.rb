@@ -41,7 +41,7 @@ module RuboCop
       # @example
       #
       #   foo %i[bar baz] { qux }
-      def invalid_percent_array_context?(node)
+      def in_invalid_context_for_percent_array?(node)
         parent = node.parent
 
         parent&.send_type? && parent.arguments.include?(node) &&

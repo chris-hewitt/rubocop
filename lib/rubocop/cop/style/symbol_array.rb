@@ -55,7 +55,7 @@ module RuboCop
           any_children_contain_spaces?(node) ||                        # bracketed_array
             comments_in_array?(node) ||                                # bracketed_array
             below_array_length?(node) ||                               # array_min_size
-            invalid_percent_array_context?(node)                       # bracketed_array
+            in_invalid_context_for_percent_array?(node)                # bracketed_array
         end
 
         def percent_array_must_become_bracketed?(node)
@@ -78,7 +78,7 @@ module RuboCop
         end
 
         def to_symbol_literal(string)
-          if symbol_without_quote?(string)
+          if can_be_converted_to_symbol_without_quoting?(string)
             ":#{string}"
           else
             ":#{to_string_literal(string)}"

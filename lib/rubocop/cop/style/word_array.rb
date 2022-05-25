@@ -61,10 +61,10 @@ module RuboCop
         private
 
         def bracketed_array_should_remain_bracketed?(node)
-          complex_content?(node) ||                                    # bracketed_array
+          complex_content?(node) ||
             comments_in_array?(node) ||                                # bracketed_array
             below_array_length?(node) ||                               # array_min_size
-            invalid_percent_array_context?(node)                       # bracketed_array
+            in_invalid_context_for_percent_array?(node)                # bracketed_array
         end
 
         def percent_array_must_become_bracketed?(node)

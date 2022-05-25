@@ -2,6 +2,7 @@
 
 module RuboCop
   module Cop
+    # Turns a percent literal array e.g. %w(foo bar) into a bracketed array e.g. ['foo', 'bar']
     class BracketedArrayCorrector
       include Util
 
@@ -32,7 +33,7 @@ module RuboCop
         # element_prefix = needs_escaping?(node) ? @element_wrap_chars[0] : @element_wrap_chars_escaped[0]
         # element_suffix = needs_escaping?(node) ? @element_wrap_chars[1] : @element_wrap_chars_escaped[1]
 
-        if symbol_without_quote?(node.source)
+        if can_be_converted_to_symbol_without_quoting?(node.source)
           # "::#{node.source}"
           @element_wrap_chars[0] + node.source + @element_wrap_chars[1]
         else

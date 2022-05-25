@@ -463,7 +463,7 @@ RSpec.describe RuboCop::Cop::Style::WordArray, :config do
     it 'preserves line breaks when autocorrecting a multiline array' do
       expect_offense(<<~RUBY)
         %w(
-        ^^^ Use `['foo', 'bar', 'baz']` for an array of words.
+        ^^^ Use `['foo',\\n'bar',\\n'baz']` for an array of words.
         foo
         bar
         baz
@@ -482,7 +482,7 @@ RSpec.describe RuboCop::Cop::Style::WordArray, :config do
     it 'preserves whitespace when autocorrecting an array using partial newlines' do
       expect_offense(<<~RUBY)
         %w(foo bar baz
-        ^^^^^^^^^^^^^^ Use `['foo', 'bar', 'baz', 'boz', 'buz', 'biz']` for an array of words.
+        ^^^^^^^^^^^^^^ Use `['foo', 'bar', 'baz',\\n'boz', 'buz',\\n'biz']` for an array of words.
         boz buz
         biz)
       RUBY

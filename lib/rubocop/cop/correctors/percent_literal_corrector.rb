@@ -2,7 +2,7 @@
 
 module RuboCop
   module Cop
-    # This autocorrects percent literals
+    # Turns a bracketed array e.g. ['foo', 'bar'] into a percent literal array e.g. %w(foo bar)
     class PercentLiteralCorrector
       include Util
 
