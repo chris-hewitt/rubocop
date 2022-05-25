@@ -39,12 +39,13 @@ module RuboCop
       class WordArray < Base
         include ArrayMinSize
         include ArraySyntax
+        include BracketedArray
         include ConfigurableEnforcedStyle
         include PercentArray
         extend AutoCorrector
 
         PERCENT_MSG = 'Use `%w` or `%W` for an array of words.'
-        ARRAY_MSG = 'Use `%<prefer>s` for an array of words.'
+        BRACKET_MSG = 'Use `%<prefer>s` for an array of words.'
 
         class << self
           attr_accessor :largest_brackets
@@ -52,18 +53,18 @@ module RuboCop
 
         def on_array(node)
           if bracketed_array_of?(:str, node)
-            return if complex_content?(node.values)
+            return if complex_content?(node)
 
-            check_bracketed_array(node, 'w')
+            check_bracketed_array(node, 'w')             # bracketed_array
           elsif node.percent_literal?(:string)
-            check_percent_array(node)
+            check_percent_array(node)                    # percent_array
           end
         end
 
         private
 
-        def complex_content?(strings, complex_regex: word_regex)
-          strings.any? do |s|
+        def complex_content?(node, complex_regex: word_regex)
+          node.children.any? do |s|
             next unless s.str_content
 
             string = s.str_content.dup.force_encoding(::Encoding::UTF_8)
@@ -73,27 +74,38 @@ module RuboCop
           end
         end
 
-        def invalid_percent_array_contents?(node)
+        def brackets_required?(node)         # used by percent_array#check_percent_array()
           # Disallow %w() arrays that contain invalid encoding or spaces
-          complex_content?(node.values, complex_regex: false)
+          node.children.any? do |s|
+            next unless s.str_content
+
+            string = s.str_content.dup.force_encoding(::Encoding::UTF_8)
+            !string.valid_encoding? || / /.match?(string)
+          end
+        end
+
+        def strings_contain_spaces?(node)
+          # pp [node, node.source, node.values, *node]
+          node.children.any? do |sym|
+            # pp [sym, sym.source, nil, *sym]
+            content, = *sym
+            / /.match?(content)
+          end
         end
 
         def word_regex
           Regexp.new(cop_config['WordRegex'])
         end
 
-        def build_bracketed_array(node)
-          words = node.children.map do |word|
-            if word.dstr_type?
-              string_literal = to_string_literal(word.source)
+        def element_for_bracketed_array(node)         # used by percent_array#build_bracketed_array()
+          if node.dstr_type?
+            string_literal = to_string_literal(node.source)                    # util
 
-              trim_string_interporation_escape_character(string_literal)
-            else
-              to_string_literal(word.children[0])
-            end
+            trim_string_interpolation_escape_character(string_literal)         # util
+          else
+            # pp [node.value.to_s, node.source, node.noderen]
+            to_string_literal(node.value.to_s)                                 # util
           end
-
-          "[#{words.join(', ')}]"
         end
       end
     end

@@ -30,12 +30,13 @@ module RuboCop
       class SymbolArray < Base
         include ArrayMinSize
         include ArraySyntax
+        include BracketedArray
         include ConfigurableEnforcedStyle
         include PercentArray
         extend AutoCorrector
 
         PERCENT_MSG = 'Use `%i` or `%I` for an array of symbols.'
-        ARRAY_MSG = 'Use `%<prefer>s` for an array of symbols.'
+        BRACKET_MSG = 'Use `%<prefer>s` for an array of symbols.'
 
         class << self
           attr_accessor :largest_brackets
@@ -45,33 +46,36 @@ module RuboCop
           if bracketed_array_of?(:sym, node)
             return if symbols_contain_spaces?(node)
 
-            check_bracketed_array(node, 'i')
+            check_bracketed_array(node, 'i')              # bracketed_array
           elsif node.percent_literal?(:symbol)
-            check_percent_array(node)
+            check_percent_array(node)                     # percent_array
           end
         end
 
         private
 
         def symbols_contain_spaces?(node)
+          # pp [node, node.source, node.values, *node]
           node.children.any? do |sym|
+            # pp [sym, sym.source, nil, *sym]
             content, = *sym
             / /.match?(content)
           end
         end
 
-        def build_bracketed_array(node)
-          syms = node.children.map do |c|
-            if c.dsym_type?
-              string_literal = to_string_literal(c.source)
+        def brackets_required?(_node)         # used by percent_array#check_percent_array()
+          false
+        end
 
-              ":#{trim_string_interporation_escape_character(string_literal)}"
-            else
-              to_symbol_literal(c.value.to_s)
-            end
+        def element_for_bracketed_array(node)         # used by percent_array#build_bracketed_array()
+          if node.dsym_type?
+            string_literal = to_string_literal(node.source)                    # util
+
+            ":#{trim_string_interpolation_escape_character(string_literal)}"   # util
+          else
+            # pp [node.value.to_s, node.source, node.noderen]
+            to_symbol_literal(node.value.to_s)                                 # util
           end
-
-          "[#{syms.join(', ')}]"
         end
 
         def to_symbol_literal(string)
