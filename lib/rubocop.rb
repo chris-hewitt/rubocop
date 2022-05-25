@@ -136,6 +136,7 @@ require_relative 'rubocop/cop/utils/format_string'
 require_relative 'rubocop/cop/migration/department_name'
 
 require_relative 'rubocop/cop/correctors/alignment_corrector'
+require_relative 'rubocop/cop/correctors/bracketed_array_corrector'
 require_relative 'rubocop/cop/correctors/condition_corrector'
 require_relative 'rubocop/cop/correctors/each_to_for_corrector'
 require_relative 'rubocop/cop/correctors/empty_line_corrector'

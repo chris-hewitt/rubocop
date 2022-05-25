@@ -47,7 +47,16 @@ module RuboCop
         message = format(self.class::ARRAY_MSG, prefer: bracketed_array)
 
         add_offense(node, message: message) do |corrector|
-          corrector.replace(node, bracketed_array)
+          percent_literal_corrector = BracketedArrayCorrector.new(@config, ['[', ']'], ['::', ''], ["::'", "'"])
+          percent_literal_corrector.correct(corrector, node)
+          # percent_literal_corrector.correct(corrector, node) do |element_content|
+          #   element_prefix = needs_escaping?(node) ? '"' : "'"
+          #   element_suffix = needs_escaping?(node) ? '"' : "'"
+          #   element_prefix + element_content + element_suffix
+          # end
+          # percent_literal_corrector.correct(corrector, node) do |element_content|
+          #   '::' + element_content
+          # end
         end
       end
 

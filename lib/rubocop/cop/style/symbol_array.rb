@@ -81,27 +81,6 @@ module RuboCop
             ":#{to_string_literal(string)}"
           end
         end
-
-        def symbol_without_quote?(string)
-          special_gvars = %w[
-            $! $" $$ $& $' $* $+ $, $/ $; $: $. $< $= $> $? $@ $\\ $_ $` $~ $0
-            $-0 $-F $-I $-K $-W $-a $-d $-i $-l $-p $-v $-w
-          ]
-          redefinable_operators = %w(
-            | ^ & <=> == === =~ > >= < <= << >>
-            + - * / % ** ~ +@ -@ [] []= ` ! != !~
-          )
-
-          # method name
-          /\A[a-zA-Z_]\w*[!?]?\z/.match?(string) ||
-            # instance / class variable
-            /\A@@?[a-zA-Z_]\w*\z/.match?(string) ||
-            # global variable
-            /\A\$[1-9]\d*\z/.match?(string) ||
-            /\A\$[a-zA-Z_]\w*\z/.match?(string) ||
-            special_gvars.include?(string) ||
-            redefinable_operators.include?(string)
-        end
       end
     end
   end
