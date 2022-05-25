@@ -29,7 +29,6 @@ module RuboCop
       #   %i[foo bar baz]
       class SymbolArray < Base
         include ArrayMinSize
-        include ArraySyntax
         include BracketedArray
         include ConfigurableEnforcedStyle
         include PercentArray
@@ -43,24 +42,24 @@ module RuboCop
         end
 
         def on_array(node)
-          if bracketed_array_of?(:sym, node)
-            return if symbols_contain_spaces?(node)
-
-            check_bracketed_array(node, 'i')              # bracketed_array
-          elsif node.percent_literal?(:symbol)
-            check_percent_array(node)                     # percent_array
+          if node.square_brackets? && contains_only?(node, :sym)       # [rubocop-ast], bracketed_array
+            check_bracketed_array(node, 'i')                           # bracketed_array
+          elsif node.percent_literal?(:symbol)                         # [rubocop-ast]
+            check_percent_array(node)                                  # percent_array
           end
         end
 
         private
 
-        def symbols_contain_spaces?(node)
-          # pp [node, node.source, node.values, *node]
-          node.children.any? do |sym|
-            # pp [sym, sym.source, nil, *sym]
-            content, = *sym
-            / /.match?(content)
-          end
+        def bracketed_array_should_remain_bracketed?(node)
+          any_children_contain_spaces?(node) ||                        # bracketed_array
+            comments_in_array?(node) ||                                # bracketed_array
+            below_array_length?(node) ||                               # array_min_size
+            invalid_percent_array_context?(node)                       # bracketed_array
+        end
+
+        def percent_array_must_become_bracketed?(node)
+          brackets_required?(node)
         end
 
         def brackets_required?(_node)         # used by percent_array#check_percent_array()

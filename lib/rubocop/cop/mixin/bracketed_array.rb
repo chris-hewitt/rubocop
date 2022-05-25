@@ -6,16 +6,11 @@ module RuboCop
     module BracketedArray
       private
 
-      def allowed_bracket_array?(node)
-        comments_in_array?(node) || below_array_length?(node) ||
-          invalid_percent_array_context?(node)
-      end
-
       # determine if an existing bracketed array can be converted to a percent array
-      def check_bracketed_array(node, literal_prefix)        # used by symbol_array#on_array() / word_array#on_array()
-        return if allowed_bracket_array?(node)
+      def check_bracketed_array(node, literal_prefix)      # used by symbol_array#on_array() / word_array#on_array()
+        return if bracketed_array_should_remain_bracketed?(node)       # symbol_array / word_array
 
-        array_style_detected(:brackets, node.values.size)
+        array_style_detected(:brackets, node.values.size)              # array_min_size
 
         return unless style == :percent
 
@@ -28,6 +23,17 @@ module RuboCop
       def comments_in_array?(node)
         line_span = node.source_range.first_line...node.source_range.last_line
         processed_source.each_comment_in_lines(line_span).any?
+      end
+
+      def contains_only?(node, child_type)
+        node.children.map(&:type).uniq == [child_type]
+      end
+
+      def any_children_contain_spaces?(node)
+        node.children.any? do |child_node|
+          content, = *child_node
+          / /.match?(content)
+        end
       end
 
       # Ruby does not allow percent arrays in an ambiguous block context.

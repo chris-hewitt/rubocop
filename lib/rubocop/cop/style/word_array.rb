@@ -38,7 +38,6 @@ module RuboCop
       #   ['foo bar', 'baz quux']
       class WordArray < Base
         include ArrayMinSize
-        include ArraySyntax
         include BracketedArray
         include ConfigurableEnforcedStyle
         include PercentArray
@@ -52,16 +51,25 @@ module RuboCop
         end
 
         def on_array(node)
-          if bracketed_array_of?(:str, node)
-            return if complex_content?(node)
-
-            check_bracketed_array(node, 'w')             # bracketed_array
-          elsif node.percent_literal?(:string)
-            check_percent_array(node)                    # percent_array
+          if node.square_brackets? && contains_only?(node, :str)       # [rubocop-ast], bracketed_array
+            check_bracketed_array(node, 'w')                           # bracketed_array
+          elsif node.percent_literal?(:string)                         # [rubocop-ast]
+            check_percent_array(node)                                  # percent_array
           end
         end
 
         private
+
+        def bracketed_array_should_remain_bracketed?(node)
+          complex_content?(node) ||                                    # bracketed_array
+            comments_in_array?(node) ||                                # bracketed_array
+            below_array_length?(node) ||                               # array_min_size
+            invalid_percent_array_context?(node)                       # bracketed_array
+        end
+
+        def percent_array_must_become_bracketed?(node)
+          brackets_required?(node)
+        end
 
         def complex_content?(node, complex_regex: word_regex)
           node.children.any? do |s|
@@ -81,15 +89,6 @@ module RuboCop
 
             string = s.str_content.dup.force_encoding(::Encoding::UTF_8)
             !string.valid_encoding? || / /.match?(string)
-          end
-        end
-
-        def strings_contain_spaces?(node)
-          # pp [node, node.source, node.values, *node]
-          node.children.any? do |sym|
-            # pp [sym, sym.source, nil, *sym]
-            content, = *sym
-            / /.match?(content)
           end
         end
 

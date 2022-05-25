@@ -6,12 +6,6 @@ module RuboCop
     # syntax.
     module ArraySyntax
       private
-
-      def bracketed_array_of?(element_type, node)
-        return false unless node.square_brackets? && !node.values.empty?
-
-        node.values.all? { |value| value.type == element_type }
-      end
     end
   end
 end

@@ -7,18 +7,18 @@ module RuboCop
       private
 
       # determine if an existing percent array can be converted to a bracketed array
-      def check_percent_array(node)                # used by symbol_array#on_array() / word_array#on_array()
-        array_style_detected(:percent, node.values.size)                    # array_min_size
+      def check_percent_array(node)                                          # used by symbol_array#on_array() / word_array#on_array()
+        array_style_detected(:percent, node.values.size)                     # array_min_size
 
-        brackets_required = brackets_required?(node)                        # symbol_array / word_array
+        brackets_required = percent_array_must_become_bracketed?(node)       # symbol_array / word_array
         return unless style == :brackets || brackets_required
 
         # If in percent style but brackets are required due to
         # string content, the file should be excluded in auto-gen-config
-        no_acceptable_style! if brackets_required                           # configurable_enforced_style
+        no_acceptable_style! if brackets_required                            # configurable_enforced_style
 
         bracketed_array = build_bracketed_array(node)
-        message = format(self.class::BRACKET_MSG, prefer: bracketed_array)  # symbol_array / word_array
+        message = format(self.class::BRACKET_MSG, prefer: bracketed_array)   # symbol_array / word_array
 
         add_offense(node, message: message) do |corrector|
           corrector.replace(node, bracketed_array)
