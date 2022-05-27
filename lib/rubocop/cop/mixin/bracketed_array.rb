@@ -25,9 +25,17 @@ module RuboCop
         processed_source.each_comment_in_lines(line_span).any?
       end
 
-      def contains_only?(node, child_type)
-        node.children.map(&:type).uniq == [child_type]
-      end
+      # def array_of_strings_only?(node, child_type)
+      #   array_contains_only?(node, :str)
+      # end
+
+      # def array_of_symbols_only?(node)
+      #   array_contains_only?(node, :sym)
+      # end
+
+      # def array_contains_only?(node, child_type)
+      #   node.children.map(&:type).uniq == [child_type]
+      # end
 
       def any_children_contain_spaces?(node)
         node.children.any? do |child_node|

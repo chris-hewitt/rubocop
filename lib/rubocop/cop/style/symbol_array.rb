@@ -42,7 +42,7 @@ module RuboCop
         end
 
         def on_array(node)
-          if node.square_brackets? && contains_only?(node, :sym)       # [rubocop-ast], bracketed_array
+          if node.square_brackets? && node.contains_only?(:sym)        # [rubocop-ast], bracketed_array
             check_bracketed_array(node, 'i')                           # bracketed_array
           elsif node.percent_literal?(:symbol)                         # [rubocop-ast]
             check_percent_array(node)                                  # percent_array

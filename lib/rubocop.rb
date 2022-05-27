@@ -14,6 +14,7 @@ require_relative 'rubocop/version'
 require 'rubocop-ast'
 
 require_relative 'rubocop/ast_aliases'
+require_relative 'rubocop/ext/array_node'
 require_relative 'rubocop/ext/regexp_node'
 require_relative 'rubocop/ext/regexp_parser'
 
