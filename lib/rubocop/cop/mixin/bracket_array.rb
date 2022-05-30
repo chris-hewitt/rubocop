@@ -2,15 +2,15 @@
 
 module RuboCop
   module Cop
-    # Common functionality for handling bracketed arrays.
-    module BracketedArray
+    # Common functionality for arrays defined using square brackets, i.e. [] - not %i[], %w(), etc.
+    module BracketArray
       private
 
       # determine if an existing bracketed array can be converted to a percent array
       def check_bracketed_array(node, literal_prefix)      # used by symbol_array#on_array() / word_array#on_array()
         return if bracketed_array_should_remain_bracketed?(node)       # symbol_array / word_array
 
-        array_style_detected(:brackets, node.values.size)              # array_min_size
+        determine_array_style_config(:brackets, node.values.size)              # array_min_size
 
         return unless style == :percent
 
@@ -39,8 +39,7 @@ module RuboCop
 
       def any_children_contain_spaces?(node)
         node.children.any? do |child_node|
-          content, = *child_node
-          / /.match?(content)
+          / /.match?(child_node.value)
         end
       end
 

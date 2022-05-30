@@ -29,7 +29,8 @@ module RuboCop
       #   %i[foo bar baz]
       class SymbolArray < Base
         include ArrayMinSize
-        include BracketedArray
+        include ArraySyntax
+        include BracketArray
         include ConfigurableEnforcedStyle
         include PercentArray
         extend AutoCorrector
@@ -58,11 +59,7 @@ module RuboCop
             in_invalid_context_for_percent_array?(node)                # bracketed_array
         end
 
-        def percent_array_must_become_bracketed?(node)
-          brackets_required?(node)
-        end
-
-        def brackets_required?(_node)         # used by percent_array#check_percent_array()
+        def percent_array_should_become_bracketed?(_node)         # used by percent_array#check_percent_array()
           false
         end
 

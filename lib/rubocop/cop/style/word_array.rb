@@ -38,7 +38,8 @@ module RuboCop
       #   ['foo bar', 'baz quux']
       class WordArray < Base
         include ArrayMinSize
-        include BracketedArray
+        include ArraySyntax
+        include BracketArray
         include ConfigurableEnforcedStyle
         include PercentArray
         extend AutoCorrector
@@ -60,6 +61,10 @@ module RuboCop
 
         private
 
+        def as_utf8(string)
+          string.dup.force_encoding(::Encoding::UTF_8)
+        end
+
         def bracketed_array_should_remain_bracketed?(node)
           complex_content?(node) ||
             comments_in_array?(node) ||                                # bracketed_array
@@ -67,22 +72,33 @@ module RuboCop
             in_invalid_context_for_percent_array?(node)                # bracketed_array
         end
 
-        def percent_array_must_become_bracketed?(node)
-          brackets_required?(node)
-        end
-
         def complex_content?(node, complex_regex: word_regex)
           node.children.any? do |s|
             next unless s.str_content
 
-            string = s.str_content.dup.force_encoding(::Encoding::UTF_8)
-            !string.valid_encoding? ||
-              (complex_regex && !complex_regex.match?(string)) ||
-              / /.match?(string)
+            # string = s.str_content.dup.force_encoding(::Encoding::UTF_8)
+            # !string.valid_encoding? ||
+            #   (complex_regex && !complex_regex.match?(string)) ||
+            #   / /.match?(string)
+
+            string = s.str_content
+            !is_valid_utf8?(string) || (word_regex && !matches_word_regex?(string)) || contains_space?(string)
           end
         end
 
-        def brackets_required?(node)         # used by percent_array#check_percent_array()
+        def contains_space?(string)
+          / /.match?(string)
+        end
+
+        def is_valid_utf8?(string)
+          as_utf8(string).valid_encoding?
+        end
+
+        def matches_word_regex?(string)
+          word_regex.match?(as_utf8(string))
+        end
+
+        def percent_array_should_become_bracketed?(node)         # used by percent_array#check_percent_array()
           # Disallow %w() arrays that contain invalid encoding or spaces
           node.children.any? do |s|
             next unless s.str_content

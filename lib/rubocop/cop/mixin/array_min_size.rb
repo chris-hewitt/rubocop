@@ -16,26 +16,29 @@ module RuboCop
         cop_config['MinSize']
       end
 
-      def array_style_detected(style, ary_size) # rubocop:todo Metrics/AbcSize
-        cfg = config_to_allow_offenses
-        return if cfg['Enabled'] == false
+      # def array_style_detected(style, ary_size) # rubocop:todo Metrics/AbcSize
+      #   cfg = config_to_allow_offenses
+      #   return if cfg['Enabled'] == false
 
-        largest_brackets = largest_brackets_size(style, ary_size)
-        smallest_percent = smallest_percent_size(style, ary_size)
+      #   largest_brackets = largest_brackets_size(style, ary_size)
+      #   smallest_percent = smallest_percent_size(style, ary_size)
 
-        if cfg['EnforcedStyle'] == style.to_s
-          # do nothing
-        elsif cfg['EnforcedStyle'].nil?
-          cfg['EnforcedStyle'] = style.to_s
-        elsif smallest_percent <= largest_brackets
-          self.config_to_allow_offenses = { 'Enabled' => false }
-        else
-          cfg['EnforcedStyle'] = 'percent'
-          cfg['MinSize'] = largest_brackets + 1
-        end
-      end
+      #   if cfg['EnforcedStyle'] == style.to_s
+      #     # do nothing
+      #   elsif cfg['EnforcedStyle'].nil?
+      #     cfg['EnforcedStyle'] = style.to_s
+      #   elsif smallest_percent <= largest_brackets
+      #     self.config_to_allow_offenses = { 'Enabled' => false }
+      #   else
+      #     cfg['EnforcedStyle'] = 'percent'
+      #     cfg['MinSize'] = largest_brackets + 1
+      #   end
+      # end
 
       def largest_brackets_size(style, ary_size)
+        # why `self.class.largest_brackets` instead of `@largest_brackets`?
+        # see https://github.com/rubocop/rubocop/pull/3973/commits/2c5dbdd1db563f2dab4754738e139f9f20b7f8fc
+
         self.class.largest_brackets ||= -Float::INFINITY
 
         if style == :brackets && ary_size > self.class.largest_brackets

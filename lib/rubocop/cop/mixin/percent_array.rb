@@ -2,20 +2,33 @@
 
 module RuboCop
   module Cop
-    # Common functionality for handling percent arrays.
+    # Common functionality for arrays defined using a percent literal syntax, e.g. %w(foo bar)
     module PercentArray
       private
 
       # determine if an existing percent array can be converted to a bracketed array
       def check_percent_array(node)                                          # used by symbol_array#on_array() / word_array#on_array()
-        array_style_detected(:percent, node.values.size)                     # array_min_size
+        determine_array_style_config(:percent, node.values.size)                     # array_min_size
+        brackets_required = percent_array_should_become_bracketed?(node)       # symbol_array / word_array
 
-        brackets_required = percent_array_must_become_bracketed?(node)       # symbol_array / word_array
         return unless style == :brackets || brackets_required
 
-        # If in percent style but brackets are required due to
-        # string content, the file should be excluded in auto-gen-config
         no_acceptable_style! if brackets_required                            # configurable_enforced_style
+
+
+#                                               brackets_required               !brackets_required
+# array_style_detected && style == :brackets    continue; no_acceptable_style!  continue
+# array_style_detected && style != :brackets    continue; no_acceptable_style!  return
+
+# if style == :brackets
+#   # continue
+# elsif brackets_required
+#   config_to_allow_offenses = { 'Enabled' => false }
+#   # continue
+# else
+#   return
+# end
+
 
         bracketed_array = build_bracketed_array(node)
         message = format(self.class::BRACKET_MSG, prefer: bracketed_array)   # symbol_array / word_array
