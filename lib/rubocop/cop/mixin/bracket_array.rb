@@ -37,9 +37,9 @@ module RuboCop
       #   node.children.map(&:type).uniq == [child_type]
       # end
 
-      def any_children_contain_spaces?(node)
+      def contains_child_with_spaces?(node)
         node.children.any? do |child_node|
-          / /.match?(child_node.value)
+          child_node.str_content && / /.match?(child_node.str_content)
         end
       end
 

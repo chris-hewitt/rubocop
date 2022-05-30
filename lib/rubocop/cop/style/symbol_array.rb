@@ -43,8 +43,8 @@ module RuboCop
         end
 
         def on_array(node)
-          if node.square_brackets? && node.contains_only?(:sym)        # [rubocop-ast], bracketed_array
-            check_bracketed_array(node, 'i')                           # bracketed_array
+          if node.square_brackets? && node.contains_only?(:sym)        # [rubocop-ast], bracket_array
+            check_bracketed_array(node, 'i')                           # bracket_array
           elsif node.percent_literal?(:symbol)                         # [rubocop-ast]
             check_percent_array(node)                                  # percent_array
           end
@@ -53,10 +53,10 @@ module RuboCop
         private
 
         def bracketed_array_should_remain_bracketed?(node)
-          any_children_contain_spaces?(node) ||                        # bracketed_array
-            comments_in_array?(node) ||                                # bracketed_array
+          contains_child_with_spaces?(node) ||                         # bracket_array
+            comments_in_array?(node) ||                                # bracket_array
             below_array_length?(node) ||                               # array_min_size
-            in_invalid_context_for_percent_array?(node)                # bracketed_array
+            in_invalid_context_for_percent_array?(node)                # bracket_array
         end
 
         def percent_array_should_become_bracketed?(_node)         # used by percent_array#check_percent_array()

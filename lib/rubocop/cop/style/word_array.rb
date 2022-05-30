@@ -52,8 +52,8 @@ module RuboCop
         end
 
         def on_array(node)
-          if node.square_brackets? && node.contains_only?(:str)        # [rubocop-ast], bracketed_array
-            check_bracketed_array(node, 'w')                           # bracketed_array
+          if node.square_brackets? && node.contains_only?(:str)        # [rubocop-ast], bracket_array
+            check_bracketed_array(node, 'w')                           # bracket_array
           elsif node.percent_literal?(:string)                         # [rubocop-ast]
             check_percent_array(node)                                  # percent_array
           end
@@ -66,53 +66,41 @@ module RuboCop
         end
 
         def bracketed_array_should_remain_bracketed?(node)
-          complex_content?(node) ||
-            comments_in_array?(node) ||                                # bracketed_array
+          contains_non_utf8_child?(node) ||
+            contains_child_not_matching_regex?(node) ||
+            contains_child_with_spaces?(node) ||                       # bracket_array
+            comments_in_array?(node) ||                                # bracket_array
             below_array_length?(node) ||                               # array_min_size
-            in_invalid_context_for_percent_array?(node)                # bracketed_array
+            in_invalid_context_for_percent_array?(node)                # bracket_array
         end
 
-        def complex_content?(node, complex_regex: word_regex)
-          node.children.any? do |s|
-            next unless s.str_content
-
-            # string = s.str_content.dup.force_encoding(::Encoding::UTF_8)
-            # !string.valid_encoding? ||
-            #   (complex_regex && !complex_regex.match?(string)) ||
-            #   / /.match?(string)
-
-            string = s.str_content
-            !is_valid_utf8?(string) || (word_regex && !matches_word_regex?(string)) || contains_space?(string)
+        def contains_child_not_matching_regex?(node)
+          regex = word_regex
+          node.children.any? do |child_node|
+            regex && child_node.str_content && !regex.match?(as_utf8(child_node.str_content))
           end
         end
 
-        def contains_space?(string)
-          / /.match?(string)
+        def contains_non_utf8_child?(node)
+          node.children.any? do |child_node|
+            child_node.str_content && !valid_utf8?(child_node.str_content)
+          end
         end
 
-        def is_valid_utf8?(string)
+        def percent_array_should_become_bracketed?(node)               # used by percent_array#check_percent_array()
+          contains_non_utf8_child?(node) ||
+            contains_child_with_spaces?(node)                          # bracket_array
+        end
+
+        def valid_utf8?(string)
           as_utf8(string).valid_encoding?
-        end
-
-        def matches_word_regex?(string)
-          word_regex.match?(as_utf8(string))
-        end
-
-        def percent_array_should_become_bracketed?(node)         # used by percent_array#check_percent_array()
-          # Disallow %w() arrays that contain invalid encoding or spaces
-          node.children.any? do |s|
-            next unless s.str_content
-
-            string = s.str_content.dup.force_encoding(::Encoding::UTF_8)
-            !string.valid_encoding? || / /.match?(string)
-          end
         end
 
         def word_regex
           Regexp.new(cop_config['WordRegex'])
         end
 
-        def element_for_bracketed_array(node)         # used by percent_array#build_bracketed_array()
+        def element_for_bracketed_array(node)              # used by percent_array#build_bracketed_array()
           if node.dstr_type?
             string_literal = to_string_literal(node.source)                    # util
 
