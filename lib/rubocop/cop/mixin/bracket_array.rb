@@ -7,10 +7,10 @@ module RuboCop
       private
 
       # determine if an existing bracketed array can be converted to a percent array
-      def check_bracketed_array(node, literal_prefix)      # used by symbol_array#on_array() / word_array#on_array()
-        return if bracketed_array_should_remain_bracketed?(node)       # symbol_array / word_array
+      def check_bracketed_array(node, literal_prefix)
+        return if bracketed_array_should_remain_bracketed?(node)
 
-        determine_array_style_config(:brackets, node.values.size)              # array_min_size
+        determine_array_style_config(:brackets, node.values.size)
 
         return unless style == :percent
 
@@ -25,21 +25,9 @@ module RuboCop
         processed_source.each_comment_in_lines(line_span).any?
       end
 
-      # def array_of_strings_only?(node, child_type)
-      #   array_contains_only?(node, :str)
-      # end
-
-      # def array_of_symbols_only?(node)
-      #   array_contains_only?(node, :sym)
-      # end
-
-      # def array_contains_only?(node, child_type)
-      #   node.children.map(&:type).uniq == [child_type]
-      # end
-
       def contains_child_with_spaces?(node)
         node.children.any? do |child_node|
-          child_node.str_content && / /.match?(child_node.str_content)
+          child_node.value && / /.match?(child_node.value)
         end
       end
 

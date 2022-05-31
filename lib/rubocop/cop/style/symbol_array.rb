@@ -37,6 +37,7 @@ module RuboCop
 
         PERCENT_MSG = 'Use `%i` or `%I` for an array of symbols.'
         BRACKET_MSG = 'Use `%<prefer>s` for an array of symbols.'
+        BRACKET_DELIMITERS = ['[', ']'], [':', ''], [":'", "'"]
 
         class << self
           attr_accessor :largest_brackets

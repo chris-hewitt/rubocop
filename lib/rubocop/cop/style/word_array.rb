@@ -46,6 +46,7 @@ module RuboCop
 
         PERCENT_MSG = 'Use `%w` or `%W` for an array of words.'
         BRACKET_MSG = 'Use `%<prefer>s` for an array of words.'
+        BRACKET_DELIMITERS = ['[', ']'], ["'", "'"], ['"', '"']
 
         class << self
           attr_accessor :largest_brackets

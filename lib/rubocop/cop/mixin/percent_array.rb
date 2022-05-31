@@ -13,7 +13,7 @@ module RuboCop
 
         return unless style == :brackets || brackets_required
 
-        no_acceptable_style! if brackets_required                              # configurable_enforced_style
+        self.config_to_allow_offenses = { 'Enabled' => false } if brackets_required                              # configurable_enforced_style
 
         #                                               brackets_required               !brackets_required
         # array_style_detected && style == :brackets    continue; no_acceptable_style!  continue
@@ -28,14 +28,14 @@ module RuboCop
         #   return
         # end
 
-        bracketed_array = build_bracketed_array(node)
-        message = format(self.class::BRACKET_MSG, prefer: bracketed_array)     # symbol_array / word_array
+        bracket_array_corrector = BracketArrayCorrector.new(node, @config, *self.class::BRACKET_DELIMITERS)
+
+        # message = format(self.class::BRACKET_MSG, prefer: bracketed_array)     # symbol_array / word_array
+        message = format(self.class::BRACKET_MSG, prefer: bracket_array_corrector.message)
+        # message = format(self.class::BRACKET_MSG, prefer: build_bracketed_array(node))
 
         add_offense(node, message: message) do |corrector|
-          corrector.replace(node, bracketed_array)
-
-          # percent_literal_corrector = BracketedArrayCorrector.new(@config, ['[', ']'], ['::', ''], ["::'", "'"])
-          # percent_literal_corrector.correct(corrector, node)
+          bracket_array_corrector.correct(corrector)
 
           # percent_literal_corrector.correct(corrector, node) do |element_content|
           #   element_prefix = needs_escaping?(node) ? '"' : "'"
@@ -47,14 +47,6 @@ module RuboCop
           #   '::' + element_content
           # end
         end
-      end
-
-      def build_bracketed_array(node)
-        elements = node.children.map do |child_node|
-          element_for_bracketed_array(child_node)          # symbol_array / word_array
-        end
-
-        "[#{elements.join(', ')}]"
       end
     end
   end
