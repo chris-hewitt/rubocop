@@ -4,29 +4,27 @@ module RuboCop
   module Cop
     # Common functionality for handling percent literals.
     module PercentLiteral
-      # include RangeHelp
+      include RangeHelp
 
       private
 
-      # def percent_literal?(node)
-      #   return unless (begin_source = begin_source(node))
+      def percent_literal?(node)
+        return unless (begin_source = begin_source(node))
 
-      #   begin_source.start_with?('%')
-      # end
+        begin_source.start_with?('%')
+      end
 
       def process(node, *types)
-        return unless node.percent_literal? && types.include?(type(node))
+        return unless percent_literal?(node) && types.include?(type(node))
 
         on_percent_literal(node)
       end
 
-      # def begin_source(node)
-      #   node.loc.begin.source if node.loc.respond_to?(:begin) && node.loc.begin
-      # end
+      def begin_source(node)
+        node.loc.begin.source if node.loc.respond_to?(:begin) && node.loc.begin
+      end
 
       def type(node)
-        puts 'source for type():'
-        pp node.loc.begin.source
         node.loc.begin.source[0..-2]
       end
     end
