@@ -15,7 +15,7 @@ module RuboCop
         return unless style == :percent
 
         add_offense(node, message: self.class::PERCENT_MSG) do |corrector|
-          percent_literal_corrector = PercentLiteralCorrector.new(@config, @preferred_delimiters)
+          percent_literal_corrector = PercentArrayCorrector.new(@config, @preferred_delimiters)
           percent_literal_corrector.correct(corrector, node, literal_prefix)
         end
       end

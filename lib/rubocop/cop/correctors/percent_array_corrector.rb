@@ -3,7 +3,7 @@
 module RuboCop
   module Cop
     # Turns a bracketed array e.g. ['foo', 'bar'] into a percent literal array e.g. %w(foo bar)
-    class PercentLiteralCorrector
+    class PercentArrayCorrector
       include Util
 
       attr_reader :config, :preferred_delimiters
@@ -17,7 +17,7 @@ module RuboCop
         escape = escape_words?(node)
         char = char.upcase if escape
         delimiters = delimiters_for("%#{char}")
-        contents = new_contents(node, escape, delimiters)
+        contents = generated_percent_array_contents(node, escape, delimiters)
         wrap_contents(corrector, node, contents, char, delimiters)
       end
 
@@ -35,21 +35,21 @@ module RuboCop
         PreferredDelimiters.new(type, config, preferred_delimiters).delimiters
       end
 
-      def new_contents(node, escape, delimiters)
+      def generated_percent_array_contents(node, escape, delimiters)
         if node.multiline?
-          autocorrect_multiline_words(node, escape, delimiters)
+          multiline_percent_array_contents(node, escape, delimiters)
         else
-          autocorrect_words(node, escape, delimiters)
+          single_line_percent_array_contents(node, escape, delimiters)
         end
       end
 
-      def autocorrect_multiline_words(node, escape, delimiters)
+      def multiline_percent_array_contents(node, escape, delimiters)
         contents = process_multiline_words(node, escape, delimiters)
         contents << end_content(node.source)
         contents.join
       end
 
-      def autocorrect_words(node, escape, delimiters)
+      def single_line_percent_array_contents(node, escape, delimiters)
         node.children.map do |word_node|
           fix_escaped_content(word_node, escape, delimiters)
         end.join(' ')

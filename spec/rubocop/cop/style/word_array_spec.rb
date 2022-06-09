@@ -275,6 +275,23 @@ RSpec.describe RuboCop::Cop::Style::WordArray, :config do
       RUBY
     end
 
+      it 'autocorrects a multiline array with irregular whitespace' do
+        expect_offense(<<-RUBY)
+          [
+          ^ Use `%w` or `%W` for an array of symbols.
+
+            :foo,  :bar,
+            :baz]
+        RUBY
+
+        expect_correction(<<-RUBY)
+          %i[
+
+            foo bar
+            baz]
+        RUBY
+      end
+
     it 'detects right value of MinSize to use for --auto-gen-config' do
       expect_offense(<<~RUBY)
         ['one', 'two', 'three']
