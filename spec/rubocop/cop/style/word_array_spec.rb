@@ -242,7 +242,7 @@ RSpec.describe RuboCop::Cop::Style::WordArray, :config do
     end
 
     it 'autocorrects an array of words in multiple lines' do
-      expect_offense(<<-RUBY)
+      expect_offense(<<~RUBY)
         [
         ^ Use `%w` or `%W` for an array of words.
         "foo",
@@ -251,7 +251,7 @@ RSpec.describe RuboCop::Cop::Style::WordArray, :config do
         ]
       RUBY
 
-      expect_correction(<<-RUBY)
+      expect_correction(<<~RUBY)
         %w(
         foo
         bar
@@ -261,17 +261,36 @@ RSpec.describe RuboCop::Cop::Style::WordArray, :config do
     end
 
     it 'autocorrects an array of words using partial newlines' do
-      expect_offense(<<-RUBY)
+      expect_offense(<<~RUBY)
         ["foo", "bar", "baz",
         ^^^^^^^^^^^^^^^^^^^^^ Use `%w` or `%W` for an array of words.
         "boz", "buz",
         "biz"]
       RUBY
 
-      expect_correction(<<-RUBY)
+      expect_correction(<<~RUBY)
         %w(foo bar baz
         boz buz
         biz)
+      RUBY
+    end
+
+    it 'autocorrects a multiline array with irregular whitespace' do
+      expect_offense(<<~RUBY)
+        [
+        ^ Use `%w` or `%W` for an array of words.
+
+          'foo',   'bar',
+
+          'baz']
+      RUBY
+
+      expect_correction(<<~RUBY)
+        %w(
+
+          foo bar
+
+          baz)
       RUBY
     end
 
@@ -457,6 +476,59 @@ RSpec.describe RuboCop::Cop::Style::WordArray, :config do
         ["\xC0"] # Invalid as UTF-8
         ['a']    # Valid as UTF-8 and ASCII
         ["あ"]   # Valid as UTF-8
+      RUBY
+    end
+
+    it 'preserves line breaks when autocorrecting a multiline array' do
+      expect_offense(<<~RUBY)
+        %w(
+        ^^^ Use `['foo', 'bar', 'baz']` for an array of words.
+        foo
+        bar
+        baz
+        )
+      RUBY
+
+      expect_correction(<<~RUBY)
+        [
+        'foo',
+        'bar',
+        'baz'
+        ]
+      RUBY
+    end
+
+    it 'autocorrects a multiline array with irregular whitespace' do
+      expect_offense(<<~RUBY)
+        %w(
+        ^^^ Use `['foo', 'bar', 'baz']` for an array of words.
+
+          foo   bar,
+
+          baz)
+      RUBY
+
+      expect_correction(<<~RUBY)
+        [
+
+          'foo', 'bar'
+
+          'baz']
+      RUBY
+    end
+
+    it 'preserves whitespace when autocorrecting an array using partial newlines' do
+      expect_offense(<<~RUBY)
+        %w(foo bar baz
+        ^^^^^^^^^^^^^^ Use `['foo', 'bar', 'baz', 'boz', 'buz', 'biz']` for an array of words.
+        boz buz
+        biz)
+      RUBY
+
+      expect_correction(<<~RUBY)
+        ['foo', 'bar', 'baz',
+        'boz', 'buz',
+        'biz']
       RUBY
     end
   end

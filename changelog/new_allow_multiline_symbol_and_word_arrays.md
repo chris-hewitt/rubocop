@@ -1,0 +1,1 @@
+* [#10455](https://github.com/rubocop/rubocop/issues/10455): Preserve line breaks when autocorrecting multiline arrays for `Style/SymbolArray` or `Style/WordArray` with `EnforcedStyle: brackets`. ([@chris-hewitt][])

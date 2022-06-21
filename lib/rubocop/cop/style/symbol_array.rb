@@ -30,12 +30,14 @@ module RuboCop
       class SymbolArray < Base
         include ArrayMinSize
         include ArraySyntax
+        include BracketedArray
         include ConfigurableEnforcedStyle
         include PercentArray
         extend AutoCorrector
 
         PERCENT_MSG = 'Use `%i` or `%I` for an array of symbols.'
-        ARRAY_MSG = 'Use `%<prefer>s` for an array of symbols.'
+        BRACKET_MSG = 'Use `%<prefer>s` for an array of symbols.'
+        BRACKET_DELIMITERS = ['[', ']'], [':', ''], [":'", "'"]
 
         class << self
           attr_accessor :largest_brackets
@@ -43,64 +45,43 @@ module RuboCop
 
         def on_array(node)
           if bracketed_array_of?(:sym, node)
-            return if symbols_contain_spaces?(node)
-
+            update_size_trackers_and_config_to_allow_offenses(:bracket, :symbol, node)
             check_bracketed_array(node, 'i')
           elsif node.percent_literal?(:symbol)
+            update_size_trackers_and_config_to_allow_offenses(:percent, :symbol, node)
             check_percent_array(node)
           end
         end
 
         private
 
-        def symbols_contain_spaces?(node)
-          node.children.any? do |sym|
-            content, = *sym
-            / /.match?(content)
-          end
+        def bracketed_array_should_remain_bracketed?(node)
+          contains_child_with_spaces?(node) ||
+            comments_in_array?(node) ||
+            below_array_length?(node) ||
+            in_invalid_context_for_percent_array?(node)
         end
 
-        def build_bracketed_array(node)
-          syms = node.children.map do |c|
-            if c.dsym_type?
-              string_literal = to_string_literal(c.source)
+        def percent_array_should_become_bracketed?(_node)
+          false
+        end
 
-              ":#{trim_string_interporation_escape_character(string_literal)}"
-            else
-              to_symbol_literal(c.value.to_s)
-            end
+        def element_for_bracketed_array(node)
+          if node.dsym_type?
+            string_literal = to_string_literal(node.source)
+
+            ":#{trim_string_interpolation_escape_character(string_literal)}"
+          else
+            to_symbol_literal(node.value.to_s)
           end
-
-          "[#{syms.join(', ')}]"
         end
 
         def to_symbol_literal(string)
-          if symbol_without_quote?(string)
+          if can_be_converted_to_symbol_without_quoting?(string)
             ":#{string}"
           else
             ":#{to_string_literal(string)}"
           end
-        end
-
-        def symbol_without_quote?(string)
-          special_gvars = %w[
-            $! $" $$ $& $' $* $+ $, $/ $; $: $. $< $= $> $? $@ $\\ $_ $` $~ $0
-            $-0 $-F $-I $-K $-W $-a $-d $-i $-l $-p $-v $-w
-          ]
-          redefinable_operators = %w(
-            | ^ & <=> == === =~ > >= < <= << >>
-            + - * / % ** ~ +@ -@ [] []= ` ! != !~
-          )
-
-          # method name
-          /\A[a-zA-Z_]\w*[!?]?\z/.match?(string) ||
-            # instance / class variable
-            /\A@@?[a-zA-Z_]\w*\z/.match?(string) ||
-            # global variable
-            /\A\$[1-9]\d*\z/.match?(string) ||
-            /\A\$[a-zA-Z_]\w*\z/.match?(string) ||
-            special_gvars.include?(string) ||
-            redefinable_operators.include?(string)
         end
       end
     end

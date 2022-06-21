@@ -2,15 +2,12 @@
 
 module RuboCop
   module Cop
-    # Common code for ordinary arrays with [] that can be written with %
-    # syntax.
+    # Common code for Style/SymbolArray and Style/WordArray cops
     module ArraySyntax
       private
 
       def bracketed_array_of?(element_type, node)
-        return false unless node.square_brackets? && !node.values.empty?
-
-        node.values.all? { |value| value.type == element_type }
+        node.square_brackets? && !node.values.empty? && node.contains_only?(element_type)
       end
     end
   end
