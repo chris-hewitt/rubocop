@@ -16,7 +16,22 @@ module RuboCop
         cop_config['MinSize']
       end
 
-      def update_size_trackers_and_cop_config(style, ary_size) # rubocop:todo Metrics/AbcSize
+      def update_size_trackers_and_config_to_allow_offenses(array_type, element_type, node)
+        if array_type == :bracket
+          return if element_type == :symbol && node.contains_element_with_space?
+          return if element_type == :word && complex_content?(node)
+          return if allowed_bracket_array?(node)
+          array_style_detected(:brackets, node.values.size)
+        elsif array_type == :percent
+          array_style_detected(:percent, node.values.size)
+          # If in percent style but brackets are required due to
+          # string content, the file should be excluded in auto-gen-config
+          no_acceptable_style! if percent_array_should_become_bracketed?(node)
+        end
+      end
+
+
+      def array_style_detected(style, ary_size) # rubocop:todo Metrics/AbcSize
         cfg = config_to_allow_offenses
         return if cfg['Enabled'] == false
 

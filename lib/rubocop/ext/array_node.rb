@@ -10,6 +10,12 @@ module RuboCop
         end
       end
 
+      def contains_child_with_spaces?
+        children.any? do |child_node|
+          / /.match?(child_node.value)
+        end
+      end
+
       AST::ArrayNode.include self
     end
   end

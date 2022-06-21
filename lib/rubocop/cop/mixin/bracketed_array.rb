@@ -9,8 +9,6 @@ module RuboCop
 
       # determine if an existing bracketed array can be converted to a percent array
       def check_bracketed_array(node, literal_prefix)
-        update_size_trackers_and_cop_config(:brackets, node.values.size)
-
         return unless style == :percent && !bracketed_array_should_remain_bracketed?(node)
 
         add_offense(node, message: self.class::PERCENT_MSG) do |corrector|
@@ -22,12 +20,6 @@ module RuboCop
       def comments_in_array?(node)
         line_span = node.source_range.first_line...node.source_range.last_line
         processed_source.each_comment_in_lines(line_span).any?
-      end
-
-      def contains_child_with_spaces?(node)
-        node.children.any? do |child_node|
-          / /.match?(child_node.value)
-        end
       end
 
       def convert_to_percent?(node)

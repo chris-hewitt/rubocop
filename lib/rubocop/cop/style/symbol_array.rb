@@ -45,8 +45,10 @@ module RuboCop
 
         def on_array(node)
           if bracketed_array_of?(:sym, node)
+            update_size_trackers_and_config_to_allow_offenses(:bracket, :symbol, node)
             check_bracketed_array(node, 'i')
           elsif node.percent_literal?(:symbol)
+            update_size_trackers_and_config_to_allow_offenses(:percent, :symbol, node)
             check_percent_array(node)
           end
         end
