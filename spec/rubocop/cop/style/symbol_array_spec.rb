@@ -194,7 +194,8 @@ RSpec.describe RuboCop::Cop::Style::SymbolArray, :config do
           [
           ^ Use `%i` or `%I` for an array of symbols.
 
-            :foo,  :bar,
+            :foo,   :bar,
+
             :baz]
         RUBY
 
@@ -202,6 +203,7 @@ RSpec.describe RuboCop::Cop::Style::SymbolArray, :config do
           %i[
 
             foo bar
+
             baz]
         RUBY
       end
@@ -279,6 +281,25 @@ RSpec.describe RuboCop::Cop::Style::SymbolArray, :config do
         [:foo, :bar, :baz,
         :boz, :buz,
         :biz]
+      RUBY
+    end
+
+    it 'autocorrects a multiline array with irregular whitespace' do
+      expect_offense(<<-RUBY)
+        %i(
+        ^^^ Use `[:foo, :bar, :baz]` for an array of symbols.
+
+          foo   bar
+
+          baz)
+      RUBY
+
+      expect_correction(<<-RUBY)
+        [
+
+          :foo, :bar,
+
+          :baz]
       RUBY
     end
   end

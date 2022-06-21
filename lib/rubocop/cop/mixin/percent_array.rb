@@ -2,7 +2,7 @@
 
 module RuboCop
   module Cop
-    # Common functionality for arrays defined using a percent literal syntax, e.g. %w(foo bar)
+    # Common functionality for arrays defined using a percent literal syntax: %i(foo bar), %W[foo bar], etc.
     module PercentArray
       private
 
@@ -38,11 +38,6 @@ module RuboCop
         corrector.replace(node, array)
       end
 
-                  def end_content(source)
-                    result = /\A(\s*)(\]|\)|\})/.match(source.split("\n").last)
-                    "\n#{result[1]}" if result
-                  end
-
       def generated_bracket_array(node, force_single_line = false)
         if node.multiline? && !force_single_line
           multiline_bracket_array(node)
@@ -51,82 +46,43 @@ module RuboCop
         end
       end
 
-                  # def line_breaks(node, array_source, previous_line_num, base_line_num, node_index)
-                  def line_breaks(node, array_source, previous_node, base_line_num, node_index)
-                    # previous_node: the previous sibling if it exists, or else the opening bracket of the parent array
-                    # previous_line_num: for first element, equals first line of array
-                    #                    otherwise last line of previous element
-                    #                    i.e the last line of the previous node of any level
-                    if node.first_line == previous_line_num # we are on the same line as the last line of the previous node (sibling or parent)
-                      node_index.zero? && node.first_line == base_line_num ? '' : ' '
-                    else
-                      source_in_lines = array_source.split("\n")
-                      process_lines(node, previous_line_num, base_line_num, source_in_lines)
-                    end
-                  end
-
-                  def multiline_contents_orig(node)
-                    contents = process_multiline_elements(node)
-                    contents << end_content(node.source)
-                    contents.join
-                  end
-
       def offense_message(node)
         recommended_array = generated_bracket_array(node, true)
-        message = format(self.class::BRACKET_MSG, prefer: recommended_array)
+        format(self.class::BRACKET_MSG, prefer: recommended_array)
       end
 
-                  def process_lines(node, previous_line_num, base_line_num, array_source_in_lines)
-                    begin_line_num = previous_line_num - base_line_num + 1
-                    end_line_num = node.first_line - base_line_num + 1
-                    lines = array_source_in_lines[begin_line_num...end_line_num]
-                    "\n#{lines.join("\n").split(node.source).first || ''}"
-                  end
-
-                  def process_multiline_elements_orig(node)
-                    base_line_num = node.first_line # first line of array
-                    final_line_num = node.last_line # last line of array
-                    prev_line_num = base_line_num # first line of array
-                    prev_node = node
-                    node.children.map.with_index do |element_node, index|
-                      # line_breaks = line_breaks(element_node, node.source, prev_line_num, base_line_num, index)
-                      line_breaks = line_breaks(element_node, node.source, prev_node, base_line_num, index)
-                      prev_line_num = element_node.last_line # last line of element
-                      delimiter = (index == 0 ? '' : ',')
-                      delimiter + line_breaks + element_for_bracketed_array(element_node)
-                      prev_node = element_node
-                    end
-                  end
-
       def multiline_bracket_array(array_node)
-        array_source_in_lines = array_node.source.split("\n")
         last_line_of_prev_node = array_node.first_line
-        generated_source = ''
-        array_node.children.each.with_index do |element_node, element_index|
-          preceding_delimiter = (element_index == 0 ? '' : ',')
-          preceding_whitespace = if element_node.first_line == last_line_of_prev_node
-                                   (element_index.zero? && element_node.first_line == array_node.first_line) ? '' : ' '
+        puts 'source:'
+        pp array_node.source.lines
+        elements_with_preceding_whitespace = array_node.children.map.with_index do |element_node, element_index|
+          element_on_same_line_as_prev = (element_node.first_line == last_line_of_prev_node)
+          preceding_whitespace = if element_on_same_line_as_prev
+                                   element_index.zero? ? '' : ' '
                                  else
-                                   begin_line_num = last_line_of_prev_node - array_node.first_line + 1
-                                   end_line_num = element_node.first_line - array_node.first_line + 1
-                                   lines = array_source_in_lines[begin_line_num...end_line_num]
-                                   something = lines.join("\n").split(element_node.source).first || ''
+                                   lines_from_end_of_prev_to_start_of_current = begin
+                                     begin_line_num = last_line_of_prev_node - array_node.first_line + 1
+                                     end_line_num = element_node.first_line - array_node.first_line + 1
+                                     array_node.source.lines[begin_line_num...end_line_num]
+                                   end
+                                   pp lines_from_end_of_prev_to_start_of_current
+                                   pp element_node.source
+                                   something = lines_from_end_of_prev_to_start_of_current.join("\n").split(element_node.source).first
                                    "\n#{something}"
                                  end
           last_line_of_prev_node = element_node.last_line
-          generated_source += preceding_delimiter + preceding_whitespace + element_for_bracketed_array(element_node)
+          preceding_whitespace + element_for_bracketed_array(element_node)
         end
         whitespace_before_closing_bracket = begin
-          result = /\A(\s*)(\]|\)|\})/.match(array_source_in_lines.last)
+          result = /\A(\s*)(\]|\)|\})/.match(array_node.source.lines.last)
           result ? "\n#{result[1]}" : ''
         end
-        generated_source += whitespace_before_closing_bracket
-        "[#{generated_source}]"
+        ['[', elements_with_preceding_whitespace.join(','), whitespace_before_closing_bracket, ']'].join
       end
 
       def single_line_bracket_array(node)
-        elements = node.children.map do |word_node|
-          element_for_bracketed_array(word_node)
+        elements = node.children.map do |element_node|
+          element_for_bracketed_array(element_node)
         end
         "[#{elements.join(', ')}]"
       end
