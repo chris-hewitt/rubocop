@@ -53,10 +53,10 @@ module RuboCop
         end
 
         def on_array(node)
-          if node.square_brackets? && node.contains_only?(:str)        # [rubocop-ast], bracket_array
-            check_bracketed_array(node, 'w')                           # bracket_array
-          elsif node.percent_literal?(:string)                         # [rubocop-ast]
-            check_percent_array(node)                                  # percent_array
+          if node.square_brackets? && node.contains_only?(:str)
+            check_bracketed_array(node, 'w')
+          elsif node.percent_literal?(:string)
+            check_percent_array(node)
           end
         end
 
@@ -69,10 +69,10 @@ module RuboCop
         def bracketed_array_should_remain_bracketed?(node)
           contains_non_utf8_child?(node) ||
             contains_child_not_matching_regex?(node) ||
-            contains_child_with_spaces?(node) ||                       # bracket_array
-            comments_in_array?(node) ||                                # bracket_array
-            below_array_length?(node) ||                               # array_min_size
-            in_invalid_context_for_percent_array?(node)                # bracket_array
+            contains_child_with_spaces?(node) ||
+            comments_in_array?(node) ||
+            below_array_length?(node) ||
+            in_invalid_context_for_percent_array?(node)
         end
 
         def contains_child_not_matching_regex?(node)
@@ -88,9 +88,9 @@ module RuboCop
           end
         end
 
-        def percent_array_should_become_bracketed?(node)               # used by percent_array#check_percent_array()
+        def percent_array_should_become_bracketed?(node)
           contains_non_utf8_child?(node) ||
-            contains_child_with_spaces?(node)                          # bracket_array
+            contains_child_with_spaces?(node)
         end
 
         def valid_utf8?(string)
@@ -101,14 +101,13 @@ module RuboCop
           Regexp.new(cop_config['WordRegex'])
         end
 
-        def element_for_bracketed_array(node)              # used by percent_array#build_bracketed_array()
+        def element_for_bracketed_array(node)
           if node.dstr_type?
-            string_literal = to_string_literal(node.source)                    # util
+            string_literal = to_string_literal(node.source)
 
-            trim_string_interpolation_escape_character(string_literal)         # util
+            trim_string_interpolation_escape_character(string_literal)
           else
-            # pp [node.value.to_s, node.source, node.noderen]
-            to_string_literal(node.value.to_s)                                 # util
+            to_string_literal(node.value.to_s)
           end
         end
       end

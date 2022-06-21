@@ -44,34 +44,33 @@ module RuboCop
         end
 
         def on_array(node)
-          if node.square_brackets? && node.contains_only?(:sym)        # [rubocop-ast], bracket_array
-            check_bracketed_array(node, 'i')                           # bracket_array
-          elsif node.percent_literal?(:symbol)                         # [rubocop-ast]
-            check_percent_array(node)                                  # percent_array
+          if node.square_brackets? && node.contains_only?(:sym)
+            check_bracketed_array(node, 'i')
+          elsif node.percent_literal?(:symbol)
+            check_percent_array(node)
           end
         end
 
         private
 
         def bracketed_array_should_remain_bracketed?(node)
-          contains_child_with_spaces?(node) ||                         # bracket_array
-            comments_in_array?(node) ||                                # bracket_array
-            below_array_length?(node) ||                               # array_min_size
-            in_invalid_context_for_percent_array?(node)                # bracket_array
+          contains_child_with_spaces?(node) ||
+            comments_in_array?(node) ||
+            below_array_length?(node) ||
+            in_invalid_context_for_percent_array?(node)
         end
 
-        def percent_array_should_become_bracketed?(_node)         # used by percent_array#check_percent_array()
+        def percent_array_should_become_bracketed?(_node)
           false
         end
 
-        def element_for_bracketed_array(node)         # used by percent_array#build_bracketed_array()
+        def element_for_bracketed_array(node)
           if node.dsym_type?
-            string_literal = to_string_literal(node.source)                    # util
+            string_literal = to_string_literal(node.source)
 
-            ":#{trim_string_interpolation_escape_character(string_literal)}"   # util
+            ":#{trim_string_interpolation_escape_character(string_literal)}"
           else
-            # pp [node.value.to_s, node.source, node.noderen]
-            to_symbol_literal(node.value.to_s)                                 # util
+            to_symbol_literal(node.value.to_s)
           end
         end
 
