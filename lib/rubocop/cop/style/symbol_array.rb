@@ -30,7 +30,7 @@ module RuboCop
       class SymbolArray < Base
         include ArrayMinSize
         include ArraySyntax
-        include BracketArray
+        include BracketedArray
         include ConfigurableEnforcedStyle
         include PercentArray
         extend AutoCorrector
@@ -44,7 +44,7 @@ module RuboCop
         end
 
         def on_array(node)
-          if node.square_brackets? && node.contains_only?(:sym)
+          if bracketed_array_of?(:sym, node)
             check_bracketed_array(node, 'i')
           elsif node.percent_literal?(:symbol)
             check_percent_array(node)

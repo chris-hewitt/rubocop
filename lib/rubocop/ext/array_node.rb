@@ -5,7 +5,9 @@ module RuboCop
     # Extensions to AST::ArrayNode
     module ArrayNode
       def contains_only?(child_type)
-        children.map(&:type).uniq == [child_type]
+        children.all? do |value|
+          value.type == child_type
+        end
       end
 
       AST::ArrayNode.include self

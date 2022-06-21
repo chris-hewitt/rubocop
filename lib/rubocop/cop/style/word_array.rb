@@ -39,7 +39,7 @@ module RuboCop
       class WordArray < Base
         include ArrayMinSize
         include ArraySyntax
-        include BracketArray
+        include BracketedArray
         include ConfigurableEnforcedStyle
         include PercentArray
         extend AutoCorrector
@@ -53,7 +53,7 @@ module RuboCop
         end
 
         def on_array(node)
-          if node.square_brackets? && node.contains_only?(:str)
+          if bracketed_array_of?(:str, node)
             check_bracketed_array(node, 'w')
           elsif node.percent_literal?(:string)
             check_percent_array(node)

@@ -10,7 +10,6 @@ module RuboCop
       def check_percent_array(node)
         determine_array_style_config(:percent, node.values.size)
         brackets_required = percent_array_should_become_bracketed?(node)
-
         return unless style == :brackets || brackets_required
 
         # If in percent style but brackets are required due to
@@ -21,39 +20,30 @@ module RuboCop
         # array_style_detected && style == :brackets    continue; no_acceptable_style!  continue
         # array_style_detected && style != :brackets    continue; no_acceptable_style!  return
 
-        # if style == :brackets
-        #   # continue
-        # elsif brackets_required
-        #   config_to_allow_offenses = { 'Enabled' => false }
-        #   # continue
-        # else
-        #   return
-        # end
-
         add_offense(node, message: offense_message(node)) do |corrector|
-          convert_to_bracket_array(corrector, node)
+          convert_to_bracketed_array(corrector, node)
         end
       end
 
-      def convert_to_bracket_array(corrector, node)
-        array = generated_bracket_array(node)
+      def convert_to_bracketed_array(corrector, node)
+        array = generated_bracketed_array(node)
         corrector.replace(node, array)
       end
 
-      def generated_bracket_array(node, force_single_line = false)
+      def generated_bracketed_array(node, force_single_line = false)
         if node.multiline? && !force_single_line
-          multiline_bracket_array(node)
+          multiline_bracketed_array(node)
         else
-          single_line_bracket_array(node)
+          single_line_bracketed_array(node)
         end
       end
 
       def offense_message(node)
-        recommended_array = generated_bracket_array(node, true)
+        recommended_array = generated_bracketed_array(node, true)
         format(self.class::BRACKET_MSG, prefer: recommended_array)
       end
 
-      def multiline_bracket_array(array_node)
+      def multiline_bracketed_array(array_node)
         last_line_of_prev_node = array_node.first_line
         puts 'source:'
         pp array_node.source.lines
@@ -82,7 +72,7 @@ module RuboCop
         ['[', elements_with_preceding_whitespace.join(','), whitespace_before_closing_bracket, ']'].join
       end
 
-      def single_line_bracket_array(node)
+      def single_line_bracketed_array(node)
         elements = node.children.map do |element_node|
           element_for_bracketed_array(element_node)
         end

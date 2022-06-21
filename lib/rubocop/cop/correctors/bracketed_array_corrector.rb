@@ -3,7 +3,7 @@
 module RuboCop
   module Cop
     # Turns a percent literal array e.g. %w(foo bar) into a bracketed array e.g. ['foo', 'bar']
-    class BracketArrayCorrector
+    class BracketedArrayCorrector
       include Util
 
       attr_reader :config
