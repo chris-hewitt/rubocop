@@ -12,12 +12,13 @@ module RuboCop
       end
 
       def determine_array_style_config(style, array_size)
-        if config_to_allow_offenses['Enabled'] == false
+        cfg = config_to_allow_offenses
+        if cfg['Enabled'] == false
           # do nothing
-        elsif config_to_allow_offenses['EnforcedStyle'] == style.to_s
+        elsif cfg['EnforcedStyle'] == style.to_s
           # do nothing
-        elsif config_to_allow_offenses['EnforcedStyle'].nil?
-          config_to_allow_offenses['EnforcedStyle'] = style.to_s
+        elsif cfg['EnforcedStyle'].nil?
+          cfg['EnforcedStyle'] = style.to_s
         else
           determine_array_style_config_based_on_size(style, array_size)
         end

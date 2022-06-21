@@ -9,10 +9,10 @@ module RuboCop
 
       # determine if an existing bracketed array can be converted to a percent array
       def check_bracketed_array(node, literal_prefix)
-        return if bracketed_array_should_remain_bracketed?(node)
-
         determine_array_style_config(:brackets, node.values.size)
         return unless style == :percent
+
+        return if bracketed_array_should_remain_bracketed?(node)
 
         add_offense(node, message: self.class::PERCENT_MSG) do |corrector|
           percent_literal_corrector = PercentArrayCorrector.new(@config, @preferred_delimiters)

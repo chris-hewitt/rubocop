@@ -14,6 +14,7 @@ module RuboCop
 
         # If in percent style but brackets are required due to
         # string content, the file should be excluded in auto-gen-config
+        # no_acceptable_style! if brackets_required
         self.config_to_allow_offenses = { 'Enabled' => false } if brackets_required
 
         #                                               brackets_required               !brackets_required
