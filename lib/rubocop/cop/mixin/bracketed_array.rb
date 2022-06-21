@@ -9,7 +9,8 @@ module RuboCop
 
       # determine if an existing bracketed array can be converted to a percent array
       def check_bracketed_array(node, literal_prefix)
-        determine_array_style_config(:brackets, node.values.size)
+        update_size_trackers_and_style_config(:brackets, node.values.size)
+
         return unless style == :percent
 
         return if bracketed_array_should_remain_bracketed?(node)

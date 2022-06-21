@@ -16,14 +16,19 @@ module RuboCop
         cop_config['MinSize']
       end
 
-      def determine_array_style_config_based_on_size(style, ary_size)
+      def determine_array_style_config_based_on_size(style, ary_size) # rubocop:todo Metrics/AbcSize
         cfg = config_to_allow_offenses
+        return if cfg['Enabled'] == false
 
         largest_brackets = largest_brackets_size(style, ary_size)
         smallest_percent = smallest_percent_size(style, ary_size)
 
-        if smallest_percent <= largest_brackets
-          self.config_to_allow_offenses = { 'Enabled' => false }
+        if cfg['EnforcedStyle'] == style.to_s
+          # do nothing
+        elsif cfg['EnforcedStyle'].nil?
+          cfg['EnforcedStyle'] = style.to_s
+        elsif smallest_percent <= largest_brackets
+          self.cfg = { 'Enabled' => false }
         else
           cfg['EnforcedStyle'] = 'percent'
           cfg['MinSize'] = largest_brackets + 1
